@@ -43,35 +43,22 @@ export async function registerController(req: Request, res: Response) {
 export async function loginController(req: Request, res: Response) {
   try {
     const { ra, senha } = req.body;
-    if (!ra || !senha)
-      return res.status(400).json({ message: 'RA e senha obrigatórios.' });
-
-    const user = await User.findOne({ ra });
-    if (!user)
+    
+    // Busca o usuário e pede explicitamente o campo senha que está com select: false
+    const user = await User.findOne({ ra }).select('+senha'); 
+    
+    if (!user || !(await bcrypt.compare(senha, user.senha))) {
       return res.status(401).json({ message: 'Credenciais inválidas.' });
+    }
 
-    const ok = await bcrypt.compare(senha, user.senha);
-    if (!ok)
-      return res.status(401).json({ message: 'Credenciais inválidas.' });
-
-    const token = jwt.sign(
-      { ra: user.ra, nome: user.nome },
-      JWT_SECRET,
-      { expiresIn: '8h' }
-    );
+    const token = jwt.sign({ ra: user.ra }, JWT_SECRET, { expiresIn: '8h' });
 
     return res.json({
       token,
-      user: {
-        ra: user.ra,
-        nome: user.nome,
-        email: user.email
-      }
+      user: { ra: user.ra, nome: user.nome, email: user.email }
     });
-
   } catch (err) {
-    console.error("Erro no Login:", err);
-    return res.status(500).json({ message: 'Erro interno no servidor.' });
+    return res.status(500).json({ message: 'Erro interno.' });
   }
 }
 
@@ -142,3 +129,4 @@ export async function resetPassword(req: Request, res: Response) {
     res.status(500).json({ message: "Erro interno no servidor." });
   }
 }
+
