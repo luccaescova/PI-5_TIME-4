@@ -4,12 +4,17 @@ import User from '../models/User';
 import bcrypt from 'bcrypt';
 
 export default async function seedDatabase() {
-  // cria usuário exemplo (RA + senha 123456)
   const ra = '24011609';
   const existingUser = await User.findOne({ ra });
+
   if (!existingUser) {
     const hash = await bcrypt.hash('123456', 10);
-    await User.create({ ra, nome: 'Lucca Scovini', senha: hash });
+    await User.create({ 
+      ra, 
+      nome: 'Lucca Scovini', 
+      senha: hash,
+      email: 'lucca@exemplo.com' // [CORREÇÃO] Adicione esta linha
+    });
     console.log('✓ usuário seed criado:', ra);
   } else {
     console.log('usuário seed já existe');

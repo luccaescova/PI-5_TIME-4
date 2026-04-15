@@ -4,42 +4,50 @@ import Question from '../models/Question';
 import { CorretorRequest } from '../models/Corretor';
 
 // Mapa para converter letras do gabarito em índices (0, 1, 2...)
-const letraParaIndice: Record<string, number> = { 'A': 0, 'B': 1, 'C': 2, 'D': 3, 'E': 4 };
+const letraParaIndice: Record<string, number> = { 'A': 0, 'B': 1, 'C': 2, 'D': 3 };
 
 const GABARITOS: Record<string, string[]> = {
-  magico_oz: ["C", "B", "C", "C", "C"], // Ajustado conforme o seed.ts
+  magico_oz: ["C", "B", "C", "C", "C"], 
   vidas_secas: ["B", "C", "B", "C", "C"],
   dom_casmurro: ["C", "C", "B", "C", "B"],
 };
 
 export async function corrigirRespostasController(req: Request, res: Response) {
   try {
-    const { livro, respostas }: CorretorRequest = req.body;
+    const { livro, respostas }: { livro: string, respostas: string[] } = req.body;
 
     if (!livro || !Array.isArray(respostas)) {
       return res.status(400).json({ message: 'Dados inválidos' });
     }
 
     const gabaritoOficial = GABARITOS[livro];
-    if (!gabaritoOficial) {
-      return res.status(404).json({ message: 'Gabarito não encontrado' });
-    }
+    if (!gabaritoOficial) return res.status(404).json({ message: 'Gabarito não encontrado' });
 
     let acertos = 0;
 
-    respostas.forEach((resAlu, index) => {
-      // Converte a letra do gabarito para o índice correspondente
-      const indiceCorreto = letraParaIndice[gabaritoOficial[index].toUpperCase()];
-      
-      // Assume que o frontend envia o índice da alternativa escolhida (0 a 4)
-      if (Number(resAlu) === indiceCorreto) {
+    respostas.forEach((respostaAluno, index) => {
+      // Pega a letra do gabarito oficial (ex: "C") e converte para índice (ex: 2)
+      const letraCorreta = gabaritoOficial[index];
+      const indiceCorreto = letraParaIndice[letraCorreta];
+
+      // Pega a letra que veio do frontend (ex: "C") e converte para índice (ex: 2)
+      const indiceAluno = letraParaIndice[respostaAluno.toUpperCase()];
+
+      // Compara os índices
+      if (indiceAluno === indiceCorreto) {
         acertos++;
       }
     });
 
-    return res.json({ acertos, total: gabaritoOficial.length, livro });
+    return res.json({ 
+      acertos, 
+      total: gabaritoOficial.length, 
+      livro 
+    });
+
   } catch (err) {
-    return res.status(500).json({ message: 'Erro na correção' });
+    console.error(err);
+    return res.status(500).json({ message: 'Erro ao processar correção' });
   }
 }
 
