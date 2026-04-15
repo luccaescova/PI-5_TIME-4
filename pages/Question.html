@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<div id="questions-container"></div>
+
+<script src="js/api.js"></script>
+<script src="js/questions.js"></script>
+
+<title>Leiturar - Simulado</title>
+
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+
+        /* NOVO FUNDO MAIS BONITO */
+        background: linear-gradient(135deg, #1E1E1E, #2b4d1f, #3d7a2c);
+        background-size: cover;
+
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 40px 0;
+        min-height: 100vh;
+    }
+
+    .container {
+        background-color: #C9FF8F;
+        width: 900px;
+        margin-top: 30px;
+
+        /* novo espaçamento para não ficar espremido */
+        padding-bottom: 40px;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0px 0px 25px rgba(0,0,0,0.4);
+    }
+
+    header {
+        display: flex;
+        align-items: center;
+        padding: 20px 30px;
+        background-color: #C9FF8F;
+    }
+
+    .menu-icon {
+        width: 35px;
+        height: 10px;
+        background-color: black;
+        position: relative;
+        margin-right: 20px;
+    }
+
+    .menu-icon::before,
+    .menu-icon::after {
+        content: "";
+        width: 35px;
+        height: 10px;
+        background-color: black;
+        position: absolute;
+        left: 0;
+    }
+
+    .menu-icon::before { top: -8px; }
+    .menu-icon::after { top: 8px; }
+
+    .logo {
+        font-size: 28px;
+        font-weight: bold;
+        color: black;
+    }
+
+    .content {
+        background-color: white;
+        margin: 25px auto;
+        width: 90%;
+        padding: 28px;
+        border-radius: 7px;
+        border: 1px solid #000;
+    }
+
+    .question-title {
+        text-align: center;
+        font-weight: bold;
+        margin-bottom: 18px;
+        font-size: 22px;
+    }
+
+    .question-text {
+        font-size: 18px;
+        margin-bottom: 20px;
+        line-height: 22px;
+    }
+
+    .option {
+        margin-top: 14px;
+        display: flex;
+        align-items: center;
+        font-size: 18px;
+        cursor: pointer;
+    }
+
+    .option input {
+        transform: scale(1.3);
+        margin-right: 10px;
+        cursor: pointer;
+    }
+
+    /* PAGINAÇÃO */
+    .pagination {
+        display: flex;
+        list-style: none;
+        padding-left: 0;
+        justify-content: center;
+        margin-top: 22px;
+    }
+
+    .pagination li {
+        margin: 0 6px;
+    }
+
+    .page-link {
+        display: block;
+        padding: 8px 12px;
+        background: white;
+        border: 1px solid black;
+        text-decoration: none;
+        color: black;
+        border-radius: 4px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .page-item.active .page-link {
+        background: #7CE96C;
+    }
+
+    .page-item.disabled .page-link {
+        opacity: 0.5;
+        pointer-events: none;
+        cursor: default;
+    }
+
+    /* BOTÃO ENVIAR (apenas na última questão) */
+    #submitBtn {
+        display: none;
+        margin-top: 25px;
+        padding: 12px 20px;
+        background-color: #2b8a2b;
+        color: white;
+        font-size: 18px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        width: 100%;
+    }
+
+    #submitBtn:hover {
+        background-color: #247524;
+    }
+
+    .navigation {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    gap: 10px; 
+}
+
+/* Estilo base consistente: Borda 2px preta, padding razoável, fonte bold */
+.nav-btn, #submitBtn {
+    padding: 10px 18px; 
+    font-size: 15px; 
+    font-weight: bold;
+    border: 2px solid #000; 
+    border-radius: 6px; /* Borda arredondada suave */
+    cursor: pointer;
+    transition: 0.2s;
+    text-transform: uppercase;
+}
+
+.nav-btn {
+    background-color: #f7f7f7; /* Fundo claro, mantendo o contraste com a borda */
+    color: black;
+    flex-grow: 1; 
+    /* Efeito de sombra leve ao passar o mouse */
+    box-shadow: 1px 1px 0px 0px #000; 
+}
+
+.nav-btn:hover:not([disabled]) {
+    background-color: #eee;
+    /* Move para cima para simular o clique */
+    transform: translateY(-1px); 
+    box-shadow: 2px 2px 0px 0px #000; 
+}
+
+.nav-btn[disabled] {
+    background-color: #ccc;
+    color: #666;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+#submitBtn {
+    /* Cor de destaque do sistema: Verde #7CD957 */
+    background-color: #7CD957; 
+    color: black;
+    width: 100%;
+    margin-top: 20px;
+    display: none; 
+    /* Efeito de sombra consistente */
+    box-shadow: 1px 1px 0px 0px #000; 
+}
+
+#submitBtn:hover {
+    background-color: #6bd04c; /* Tonalidade levemente mais escura no hover */
+    transform: translateY(-1px);
+    box-shadow: 2px 2px 0px 0px #000;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <header>
+        <div class="menu-icon"></div>
+        <div class="logo">Leiturar</div>
+    </header>
+
+    <div class="content">
+    <div id="title" class="question-title">Questão 1</div>
+    <div id="questionText" class="question-text"></div>
+    
+    <label class="option">
+        <input type="radio" name="questao" value="A" id="altA"> 
+        <span id="textA"></span>
+    </label>
+    <label class="option">
+        <input type="radio" name="questao" value="B" id="altB"> 
+        <span id="textB"></span>
+    </label>
+    <label class="option">
+        <input type="radio" name="questao" value="C" id="altC"> 
+        <span id="textC"></span>
+    </label>
+    <label class="option">
+        <input type="radio" name="questao" value="D" id="altD"> 
+        <span id="textD"></span>
+    </label>
+    
+    <div class="navigation">
+        <button id="prevBtn" class="nav-btn" disabled>Anterior</button>
+        <button id="nextBtn" class="nav-btn">Próxima</button>
+    </div>
+
+    <button id="submitBtn" onclick="submitAnswers()">Enviar respostas</button>
+    
+</div>
+</div>
+
+</body>
+
+<script>
+    // [CORREÇÃO] Centralizando a URL para o servidor Node
+    const API_URL = 'http://localhost:4000';   
+    
+    let bookId = '';
+    let questions = [];
+    let currentQuestionIndex = 0;
+    let studentAnswers = {}; 
+
+    const titleElement = document.getElementById('title');
+    const questionTextElement = document.getElementById('questionText');
+    const alternativesElements = {
+        A: document.getElementById('textA'),
+        B: document.getElementById('textB'),
+        C: document.getElementById('textC'),
+        D: document.getElementById('textD')
+    };
+    const radioInputs = [
+        document.getElementById('altA'),
+        document.getElementById('altB'),
+        document.getElementById('altC'),
+        document.getElementById('altD')
+    ];
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const submitBtn = document.getElementById('submitBtn');
+
+    const indexToLetter = ['A', 'B', 'C', 'D']; 
+    
+    function getBookIdFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+        return params.get('livro');
+    }
+
+    async function loadQuestions() {
+        bookId = getBookIdFromUrl();
+        if (!bookId) {
+            questionTextElement.innerText = "Erro: ID do livro não encontrado.";
+            return;
+        }
+
+        const token = localStorage.getItem('leiturar_token');
+        if (!token) {
+            alert('Sessão expirada. Faça login novamente.');
+            window.location.href = 'Login.html';
+            return;
+        }
+
+        try {
+            // [AJUSTE] Usando a constante centralizada
+            const response = await fetch(`${API_URL}/books/${bookId}/questions`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            questions = await response.json();
+
+            if (response.ok && questions.length > 0) {
+                renderQuestion(0);
+            } else if (response.ok && questions.length === 0) {
+                questionTextElement.innerText = "Nenhuma questão encontrada para este livro.";
+            } else {
+                questionTextElement.innerText = `Erro ao carregar questões: ${questions.message || 'Erro desconhecido.'}`;
+            }
+        } catch (error) {
+            console.error('Erro na requisição:', error);
+            questionTextElement.innerText = 'Erro de conexão com o servidor de questões.';
+        }
+    }
+
+    function renderQuestion(index) {
+        if (index < 0 || index >= questions.length) return;
+
+        currentQuestionIndex = index;
+        const q = questions[index];
+        const questionNumber = index + 1;
+
+        titleElement.innerText = `Questão ${questionNumber} de ${questions.length}`;
+        questionTextElement.innerText = q.pergunta;
+
+        radioInputs.forEach(input => input.checked = false);
+        q.alternativas.forEach((altText, altIndex) => {
+            const letter = indexToLetter[altIndex];
+            if (alternativesElements[letter]) {
+                alternativesElements[letter].innerText = altText;
+            }
+        });
+
+        const savedAnswerLetter = studentAnswers[index];
+        if (savedAnswerLetter) {
+            const radioToSelect = document.getElementById(`alt${savedAnswerLetter}`);
+            if (radioToSelect) radioToSelect.checked = true;
+        }
+
+        updateNavigationButtons();
+    }
+    
+    function saveAnswer() {
+        const selectedRadio = radioInputs.find(input => input.checked);
+        if (selectedRadio) {
+            studentAnswers[currentQuestionIndex] = selectedRadio.value;
+        }
+    }
+
+    function updateNavigationButtons() {
+        prevBtn.disabled = currentQuestionIndex === 0;
+        nextBtn.style.display = currentQuestionIndex === questions.length - 1 ? 'none' : 'inline-block';
+        submitBtn.style.display = currentQuestionIndex === questions.length - 1 ? 'block' : 'none';
+    }
+
+    prevBtn.onclick = () => { saveAnswer(); renderQuestion(currentQuestionIndex - 1); };
+    nextBtn.onclick = () => { saveAnswer(); renderQuestion(currentQuestionIndex + 1); };
+    
+    radioInputs.forEach(input => {
+        input.addEventListener('change', saveAnswer);
+    });
+    
+    // [CORREÇÃO PRINCIPAL] Função migrada do Java para o Node
+    async function submitAnswers() {
+        saveAnswer(); 
+
+        const token = localStorage.getItem('leiturar_token');
+
+        if (Object.keys(studentAnswers).length < questions.length) {
+            const confirm = window.confirm('Você não respondeu todas as questões. Enviar assim mesmo?');
+            if (!confirm) return;
+        }
+
+        const answersArray = questions.map((_, index) => {
+            return studentAnswers[index] || 'N'; 
+        });
+
+        const payload = {
+            livro: bookId, 
+            respostas: answersArray 
+        };
+
+        try {
+            // [CORREÇÃO] Rota alterada de /corretor/corrigir (Java) para /books/corrigir (Node)
+            const response = await fetch(`${API_URL}/books/corrigir`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` // [ADICIONADO] Token para segurança
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                alert(`Resultado: Você acertou ${result.acertos} de ${result.total} questões!`);
+                window.location.href = 'Menu.html';
+            } else {
+                alert(`Erro na correção: ${result.message || 'Erro no servidor.'}`);
+            }
+        } catch (error) {
+            console.error('Erro na requisição para o corretor:', error);
+            // [CORREÇÃO] Mensagem atualizada para refletir o servidor correto
+            alert('Erro de conexão com o Servidor Node (Porta 4000). Verifique se o backend está rodando.');
+        }
+    }
+
+    window.onload = loadQuestions;
+</script>
+</html>
