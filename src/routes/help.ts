@@ -1,8 +1,8 @@
-import { Router } from "express";
-import { sendHelpEmail } from "../controllers/helpController";
+import { Router } from 'express';
+import { askGeminiHelp } from '../controllers/helpController';
 
 const router = Router();
 
-router.post("/send", sendHelpEmail);
+router.post('/ask', askGeminiHelp);
 
 export default router;
