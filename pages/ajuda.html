@@ -3,114 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Leiturar – Dúvidas & Suporte</title>
+<title>Leiturar – Suporte IA</title>
 
 <style>
-    body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background-color: #1E1E1E;
-        display: flex;
-        justify-content: center;
-    }
-
-    .container {
-        background-color: #C9FF8F;
-        width: 1000px;
-        min-height: 100vh;
-        border-radius: 10px;
-        overflow: hidden;
-        position: relative;
-    }
-
-    /* HEADER */
-    header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 25px 35px;
-        background-color: #C9FF8F;
-    }
-
-    .left-area {
-        display: flex;
-        align-items: center;
-        gap: 25px;
-    }
-
-    .menu-icon {
-        width: 35px;
-        height: 10px;
-        background-color: black;
-        position: relative;
-        cursor: pointer;
-    }
-
-    .menu-icon::before,
-    .menu-icon::after {
-        content: "";
-        width: 35px;
-        height: 10px;
-        background-color: black;
-        position: absolute;
-        left: 0;
-    }
-
-    .menu-icon::before { top: -8px; }
-    .menu-icon::after { top: 8px; }
-
-    .logo {
-        font-size: 28px;
-        font-weight: bold;
-        color: black;
-    }
-
-    .search-area {
-        display: flex;
-        align-items: center;
-    }
-
-    .search-input {
-        padding: 8px 12px;
-        border-radius: 20px;
-        border: 1px solid #333;
-        width: 260px;
-        font-size: 14px;
-    }
-
-    /* DROPDOWN MENU */
-    .dropdown-menu {
-        position: absolute;
-        top: 75px;
-        left: 35px;
-        background-color: #C9FF8F;
-        border: 2px solid black;
-        border-radius: 8px;
-        display: none;
-        flex-direction: column;
-        width: 180px;
-        z-index: 1000;
-    }
-
-    .dropdown-menu button {
-        padding: 12px;
-        background: #C9FF8F;
-        border: none;
-        border-bottom: 2px solid black;
-        cursor: pointer;
-        font-weight: bold;
-        text-align: left;
-    }
-
-    .dropdown-menu button:hover {
-        background-color: #b7f07d;
-    }
-
-    .dropdown-menu button:last-child {
-        border-bottom: none;
-    }
-
-    /* CONTENT */
+    /* ... (Mantive seus estilos originais de body, container, header e dropdown) ... */
+    body { margin: 0; font-family: Arial, sans-serif; background-color: #1E1E1E; display: flex; justify-content: center; }
+    .container { background-color: #C9FF8F; width: 1000px; min-height: 100vh; border-radius: 10px; overflow: hidden; position: relative; }
+    header { display: flex; align-items: center; justify-content: space-between; padding: 25px 35px; background-color: #C9FF8F; }
+    .left-area { display: flex; align-items: center; gap: 25px; }
+    .menu-icon { width: 35px; height: 10px; background-color: black; position: relative; cursor: pointer; }
+    .menu-icon::before, .menu-icon::after { content: ""; width: 35px; height: 10px; background-color: black; position: absolute; left: 0; }
+    .menu-icon::before { top: -8px; } .menu-icon::after { top: 8px; }
+    .logo { font-size: 28px; font-weight: bold; color: black; }
+    .dropdown-menu { position: absolute; top: 75px; left: 35px; background-color: #C9FF8F; border: 2px solid black; border-radius: 8px; display: none; flex-direction: column; width: 180px; z-index: 1000; }
+    .dropdown-menu button { padding: 12px; background: #C9FF8F; border: none; border-bottom: 2px solid black; cursor: pointer; font-weight: bold; text-align: left; }
+    
+    /* CONTENT AJUSTADO PARA IA */
     .content {
         background-color: white;
         width: 90%;
@@ -118,47 +26,23 @@
         padding: 30px;
         border-radius: 10px;
         border: 1px solid #000;
-        min-height: 400px;
+        display: flex;
+        flex-direction: column;
     }
 
-    .section-title {
-        font-size: 26px;
-        font-weight: bold;
-        color: #333;
-        margin-bottom: 10px;
-    }
-
-    .section-text {
-        font-size: 16px;
-        color: #444;
-        margin-bottom: 25px;
-    }
-
-    .input-label {
-        font-weight: bold;
-        margin-bottom: 8px;
-        display: block;
-        color: #333;
-    }
-
-    .email-input {
-        width: 100%;
-        padding: 10px;
-        font-size: 16px;
-        border: 1px solid #000;
-        border-radius: 8px;
-        margin-bottom: 20px;
-    }
+    .section-title { font-size: 26px; font-weight: bold; color: #333; margin-bottom: 10px; }
+    .section-text { font-size: 16px; color: #444; margin-bottom: 25px; }
 
     .textarea-input {
         width: 100%;
-        height: 160px;
-        padding: 10px;
+        height: 100px;
+        padding: 12px;
         font-size: 15px;
-        border: 1px solid #000;
+        border: 2px solid #000;
         border-radius: 8px;
-        resize: vertical;
-        margin-bottom: 20px;
+        resize: none;
+        margin-bottom: 15px;
+        box-sizing: border-box;
     }
 
     .send-btn {
@@ -170,30 +54,34 @@
         font-size: 18px;
         font-weight: bold;
         cursor: pointer;
+        transition: 0.2s;
     }
 
-    .send-btn:hover {
-        background-color: #6dc84a;
+    .send-btn:disabled { background-color: #ccc; cursor: not-allowed; }
+
+    /* ÁREA DE RESPOSTA DA IA */
+    #ai-response-container {
+        margin-top: 25px;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-left: 5px solid #7CD957;
+        border-radius: 4px;
+        display: none; /* Escondido até ter uma resposta */
     }
+
+    .ai-label { font-weight: bold; color: #2b4d1f; margin-bottom: 8px; display: block; }
+    .ai-text { font-size: 15px; line-height: 1.6; color: #333; white-space: pre-wrap; }
 </style>
 </head>
 
 <body>
 
 <div class="container">
-
-    <!-- HEADER -->
     <header>
         <div class="left-area">
             <div class="menu-icon" onclick="toggleDropdown()"></div>
-            <div class="logo">Leiturar</div>
+            <div class="logo">Leiturar AI</div>
         </div>
-
-        <div class="search-area">
-            <input class="search-input" type="search" placeholder="Pesquisar...">
-        </div>
-
-        <!-- DROPDOWN -->
         <div id="dropdownMenu" class="dropdown-menu">
             <button onclick="window.location.href='Menu.html'">Menu</button>
             <button onclick="window.location.href='Favoritos.html'">Favoritos</button>
@@ -201,28 +89,25 @@
         </div>
     </header>
 
-    <!-- CONTENT -->
     <div class="content">
-        <div class="section-title">Ajuda & Suporte</div>
-
+        <div class="section-title">Assistente Virtual</div>
         <p class="section-text">
-            Aqui você pode tirar dúvidas, relatar erros, sugerir melhorias ou pedir ajuda sobre o aplicativo.
-            Responderemos assim que possível no email informado!
+            Pergunte qualquer coisa sobre os livros, autores ou como usar o Leiturar. Nossa IA está pronta para ajudar!
         </p>
 
-        <label class="input-label">Seu email:</label>
-        <input type="email" class="email-input" placeholder="Digite seu email">
+        <textarea class="textarea-input" id="user-prompt" placeholder="Ex: Quem escreveu Dom Casmurro? ou Como favorito um livro?"></textarea>
 
-        <label class="input-label">Descreva sua dúvida ou problema:</label>
-        <textarea class="textarea-input" placeholder="Escreva aqui..."></textarea>
+        <button class="send-btn" id="btn-ask">Perguntar ao Gemini</button>
 
-        <button class="send-btn">Enviar</button>
+        <div id="ai-response-container">
+            <span class="ai-label">Resposta do Leiturar:</span>
+            <div class="ai-text" id="ai-answer"></div>
+        </div>
     </div>
-
 </div>
 
 <script>
-
+/* LÓGICA DE INTERFACE MANTIDA */
 function handleLogout() {
     localStorage.removeItem('leiturar_token');
     localStorage.removeItem('leiturar_user');
@@ -234,47 +119,53 @@ function toggleDropdown() {
     menu.style.display = (menu.style.display === "flex") ? "none" : "flex";
 }
 
-window.addEventListener("click", function(e) {
-    const menu = document.getElementById("dropdownMenu");
-    const icon = document.querySelector(".menu-icon");
+/* ===== INTEGRAÇÃO COM O BACKEND (GEMINI) ===== */
+document.getElementById("btn-ask").addEventListener("click", async () => {
+    const promptInput = document.getElementById("user-prompt");
+    const prompt = promptInput.value.trim();
+    const btn = document.getElementById("btn-ask");
+    const responseContainer = document.getElementById("ai-response-container");
+    const answerDiv = document.getElementById("ai-answer");
 
-    if (!menu.contains(e.target) && !icon.contains(e.target)) {
-        menu.style.display = "none";
-    }
-});
-
-/* ===== ENVIO DO EMAIL ===== */
-document.querySelector(".send-btn").addEventListener("click", async () => {
-    const email = document.querySelector(".email-input").value.trim();
-    const message = document.querySelector(".textarea-input").value.trim();
-
-    if (!email || !message) {
-        alert("Por favor, preencha seu email e a mensagem.");
+    if (!prompt) {
+        alert("Por favor, digite uma pergunta.");
         return;
     }
 
+    // Estado de carregamento
+    btn.innerText = "IA pensando...";
+    btn.disabled = true;
+    responseContainer.style.display = "none";
+
     try {
-        const response = await fetch("http://localhost:4000/help/send", {
+        const response = await fetch("http://localhost:4000/help/ask", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, message })
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem('leiturar_token')}` // Enviando token se necessário
+            },
+            body: JSON.stringify({ prompt })
         });
 
+        const data = await response.json();
+
         if (response.ok) {
-            alert("📨 Email enviado com sucesso! Nossa equipe entrará em contato.");
-            document.querySelector(".email-input").value = "";
-            document.querySelector(".textarea-input").value = "";
+            responseContainer.style.display = "block";
+            answerDiv.innerText = data.answer;
+            promptInput.value = ""; // Limpa o campo após sucesso
         } else {
-            alert("Erro ao enviar. Tente novamente mais tarde.");
+            alert("Ocorreu um erro: " + (data.error || "Erro desconhecido"));
         }
 
     } catch (err) {
         console.error(err);
-        alert("Erro de conexão com o servidor.");
+        alert("Erro de conexão com o servidor. Verifique se o Backend está rodando na porta 4000.");
+    } finally {
+        btn.innerText = "Perguntar ao Gemini";
+        btn.disabled = false;
     }
 });
 </script>
-
 
 </body>
 </html>
