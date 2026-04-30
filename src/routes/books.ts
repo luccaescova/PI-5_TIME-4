@@ -2,26 +2,20 @@ import { Router } from 'express';
 import {
   listBooksController,
   getBookQuestionsController,
-  addQuestionController,
-  addBookController,
-  corrigirRespostasController // Importe a função que criamos
+  corrigirRespostasController,
+  addBookController
 } from '../controllers/booksController';
+import { getRecommendationsController } from '../controllers/recommendationController';
 
 const router = Router();
 
-// listar livros
+// Sistema de Quizzes e Gestão
 router.get('/', listBooksController);
-
-// criar livro (opcional/admin)
 router.post('/', addBookController);
-
-// listar questões de um livro
 router.get('/:bookId/questions', getBookQuestionsController);
-
-// adicionar questão a um livro
-router.post('/:bookId/questions', addQuestionController);
-
-// 2. Adicione a rota de correção (Equivalente ao @PostMapping do Java)
 router.post('/corrigir', corrigirRespostasController);
+
+// Novo: Algoritmo de Recomendação
+router.get('/recommendations/:ra', getRecommendationsController);
 
 export default router;
