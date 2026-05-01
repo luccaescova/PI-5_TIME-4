@@ -6,16 +6,15 @@ export interface IBook {
   autor: string;
   tags: string[]; 
   pdfPath?: string;
-  resumo?: string;
 }
 
 const BookSchema = new Schema<IBook>({
   _id: { type: String, required: true },
   titulo: { type: String, required: true },
   autor: { type: String, required: true },
-  tags: { type: [String], default: [] },
+  tags: { type: [String], default: [] }, 
   pdfPath: { type: String },
-  resumo: { type: String },
 }, { timestamps: true });
 
-export default model<IBook>('Book', BookSchema);
+const BookModel = model<IBook>('Book', BookSchema);
+export default BookModel;
