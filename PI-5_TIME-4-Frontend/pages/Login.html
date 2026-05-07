@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Leiturar – Login</title>
+
+<style>
+    body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #1C3B3B;
+        font-family: Arial, sans-serif;
+    }
+
+    .login-container {
+        background-color: #C9FF8F;
+        width: 380px;
+        padding: 30px 35px;
+        border-radius: 10px;
+        border: 2px solid #000;
+        box-shadow: 0 0 14px rgba(0,0,0,0.35);
+        text-align: center;
+    }
+
+    .login-title {
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        color: black;
+    }
+
+    .login-container input {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        font-size: 15px;
+        border: 1px solid black;
+        border-radius: 5px;
+    }
+
+    .login-btn {
+        width: 100%;
+        padding: 12px;
+        background-color: #7CD957;
+        color: black;
+        font-size: 16px;
+        font-weight: bold;
+        border: 2px solid #000;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .login-btn:hover {
+        transform: scale(1.03);
+        background-color: #6bd04c;
+    }
+
+    .forgot-link {
+        display: block;
+        margin-top: 12px;
+        font-size: 14px;
+        color: black;
+        text-decoration: none;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .forgot-link:hover {
+        text-decoration: underline;
+    }
+
+    /* POP-UP */
+    .popup-background {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.6);
+        justify-content: center;
+        align-items: center;
+    }
+
+    .popup-box {
+        background: #C9FF8F;
+        width: 350px;
+        padding: 25px;
+        border-radius: 10px;
+        border: 2px solid black;
+        box-shadow: 0 0 14px rgba(0,0,0,0.35);
+        text-align: center;
+    }
+
+    .popup-title {
+        font-size: 22px;
+        font-weight: bold;
+        margin-bottom: 15px;
+    }
+
+    .popup-box input {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 12px;
+        border: 1px solid black;
+        border-radius: 5px;
+    }
+
+    .close-btn {
+        background-color: #ff6b6b;
+        border: 2px solid black;
+        padding: 8px;
+        width: 100%;
+        margin-top: 5px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: 0.2s;
+    }
+
+    .close-btn:hover {
+        transform: scale(1.03);
+        background-color: #ff5252;
+    }
+</style>
+</head>
+<body>
+
+<div class="login-container">
+    <div class="login-title">LOGIN</div>
+    <form onsubmit="handleLogin(event)">
+        <input type="text" id="loginRA" placeholder="RA" required />
+        <input type="password" id="loginSenha" placeholder="Senha" required />
+        <button type="submit" class="login-btn">ENTRAR</button>
+
+        <a class="forgot-link" onclick="abrirPopup()">Esqueci a senha</a>
+
+        <!-- 🚀 BOTÃO DE REGISTRO ADICIONADO -->
+        <a class="forgot-link" href="Register.html" style="margin-top: 8px; color: blue;">
+            Criar conta
+        </a>
+    </form>
+</div>
+
+<div class="popup-background" id="popup">
+    <div class="popup-box">
+        <div class="popup-title">Recuperar senha</div>
+        <input type="text" id="popupRA" placeholder="Seu RA" required>
+        <input type="email" id="popupEmail" placeholder="Seu email cadastrado" required>
+        <button class="login-btn" onclick="enviarRecuperacao()">ENVIAR</button>
+        <button class="close-btn" onclick="fecharPopup()">FECHAR</button>
+    </div>
+</div>
+
+<!-- POPUP DE REDEFINIÇÃO DE SENHA -->
+<div class="popup-background" id="popupReset">
+    <div class="popup-box">
+        <div class="popup-title">Redefinir senha</div>
+        <input type="password" id="novaSenha" placeholder="Nova senha" required>
+        <button class="login-btn" onclick="resetarSenha()">REDEFINIR</button>
+        <button class="close-btn" onclick="fecharPopupReset()">FECHAR</button>
+    </div>
+</div>
+
+
+<script>
+    const API_URL = 'http://localhost:4000'; 
+
+    // ---------- POPUPS ----------
+    function abrirPopup() {
+        document.getElementById("popup").style.display = "flex";
+    }
+
+    function fecharPopup() {
+        document.getElementById("popup").style.display = "none";
+    }
+
+    function abrirPopupReset() {
+        document.getElementById("popupReset").style.display = "flex";
+    }
+
+    function fecharPopupReset() {
+        document.getElementById("popupReset").style.display = "none";
+    }
+
+
+    // ---------- ETAPA 1: VERIFICA RA + EMAIL ---------
+    async function enviarRecuperacao() {
+        const ra = document.getElementById("popupRA").value;
+        const email = document.getElementById("popupEmail").value;
+
+        if (!ra || !email) {
+            alert("Preencha todos os campos!");
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_URL}/auth/forgot-password`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ra, email })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Salva o token localmente
+                localStorage.setItem("reset_token", data.token);
+
+                fecharPopup();  
+                abrirPopupReset(); 
+            } else {
+                alert(data.message);
+            }
+        } catch (error) {
+            alert('Erro de conexão com o servidor.');
+        }
+    }
+
+
+    // ---------- ETAPA 2: ENVIAR NOVA SENHA ----------
+    async function resetarSenha() {
+        const novaSenha = document.getElementById("novaSenha").value;
+        const token = localStorage.getItem("reset_token");
+
+        if (!novaSenha) {
+            alert("Digite sua nova senha!");
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_URL}/auth/reset-password/${token}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ novaSenha })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert("Senha redefinida com sucesso!");
+                localStorage.removeItem("reset_token");
+                fecharPopupReset();
+            } else {
+                alert(data.message);
+            }
+
+        } catch (error) {
+            alert("Erro ao se conectar ao servidor.");
+        }
+    }
+
+
+    // ----------- LOGIN ORIGINAL (Mantido) ----------
+    async function handleLogin(event) {
+        event.preventDefault();
+        const ra = document.getElementById('loginRA').value;
+        const senha = document.getElementById('loginSenha').value;
+
+        try {
+            const response = await fetch(`${API_URL}/auth/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ra, senha })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                localStorage.setItem('leiturar_token', data.token);
+                localStorage.setItem('leiturar_user', JSON.stringify(data.user));
+                window.location.href = 'Menu.html';
+            } else {
+                alert(data.message);
+            }
+        } catch (error) {
+            alert('Erro de conexão com o servidor.');
+        }
+    }
+</script>
+
+</body>
+</html>

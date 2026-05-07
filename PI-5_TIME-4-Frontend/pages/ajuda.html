@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leiturar – Dúvidas & Suporte</title>
+
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: #1E1E1E;
+        display: flex;
+        justify-content: center;
+    }
+
+    .container {
+        background-color: #C9FF8F;
+        width: 1000px;
+        min-height: 100vh;
+        border-radius: 10px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    /* HEADER */
+    header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 25px 35px;
+        background-color: #C9FF8F;
+    }
+
+    .left-area {
+        display: flex;
+        align-items: center;
+        gap: 25px;
+    }
+
+    .menu-icon {
+        width: 35px;
+        height: 10px;
+        background-color: black;
+        position: relative;
+        cursor: pointer;
+    }
+
+    .menu-icon::before,
+    .menu-icon::after {
+        content: "";
+        width: 35px;
+        height: 10px;
+        background-color: black;
+        position: absolute;
+        left: 0;
+    }
+
+    .menu-icon::before { top: -8px; }
+    .menu-icon::after { top: 8px; }
+
+    .logo {
+        font-size: 28px;
+        font-weight: bold;
+        color: black;
+    }
+
+    .search-area {
+        display: flex;
+        align-items: center;
+    }
+
+    .search-input {
+        padding: 8px 12px;
+        border-radius: 20px;
+        border: 1px solid #333;
+        width: 260px;
+        font-size: 14px;
+    }
+
+    /* DROPDOWN MENU */
+    .dropdown-menu {
+        position: absolute;
+        top: 75px;
+        left: 35px;
+        background-color: #C9FF8F;
+        border: 2px solid black;
+        border-radius: 8px;
+        display: none;
+        flex-direction: column;
+        width: 180px;
+        z-index: 1000;
+    }
+
+    .dropdown-menu button {
+        padding: 12px;
+        background: #C9FF8F;
+        border: none;
+        border-bottom: 2px solid black;
+        cursor: pointer;
+        font-weight: bold;
+        text-align: left;
+    }
+
+    .dropdown-menu button:hover {
+        background-color: #b7f07d;
+    }
+
+    .dropdown-menu button:last-child {
+        border-bottom: none;
+    }
+
+    /* CONTENT */
+    .content {
+        background-color: white;
+        width: 90%;
+        margin: 30px auto;
+        padding: 30px;
+        border-radius: 10px;
+        border: 1px solid #000;
+        min-height: 400px;
+    }
+
+    .section-title {
+        font-size: 26px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    .section-text {
+        font-size: 16px;
+        color: #444;
+        margin-bottom: 25px;
+    }
+
+    .input-label {
+        font-weight: bold;
+        margin-bottom: 8px;
+        display: block;
+        color: #333;
+    }
+
+    .email-input {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #000;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+
+    .textarea-input {
+        width: 100%;
+        height: 160px;
+        padding: 10px;
+        font-size: 15px;
+        border: 1px solid #000;
+        border-radius: 8px;
+        resize: vertical;
+        margin-bottom: 20px;
+    }
+
+    .send-btn {
+        width: 100%;
+        padding: 12px;
+        background-color: #7CD957;
+        border: 2px solid #000;
+        border-radius: 8px;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .send-btn:hover {
+        background-color: #6dc84a;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+    <header>
+        <div class="left-area">
+            <div class="menu-icon" onclick="toggleDropdown()"></div>
+            <div class="logo">Leiturar</div>
+        </div>
+
+        <div class="search-area">
+            <input class="search-input" type="search" placeholder="Pesquisar...">
+        </div>
+
+        <!-- DROPDOWN -->
+        <div id="dropdownMenu" class="dropdown-menu">
+            <button onclick="window.location.href='Menu.html'">Menu</button>
+            <button onclick="window.location.href='Favoritos.html'">Favoritos</button>
+            <button onclick="handleLogout()">Logout</button>
+        </div>
+    </header>
+
+    <!-- CONTENT -->
+    <div class="content">
+        <div class="section-title">Ajuda & Suporte</div>
+
+        <p class="section-text">
+            Aqui você pode tirar dúvidas, relatar erros, sugerir melhorias ou pedir ajuda sobre o aplicativo.
+            Responderemos assim que possível no email informado!
+        </p>
+
+        <label class="input-label">Seu email:</label>
+        <input type="email" class="email-input" placeholder="Digite seu email">
+
+        <label class="input-label">Descreva sua dúvida ou problema:</label>
+        <textarea class="textarea-input" placeholder="Escreva aqui..."></textarea>
+
+        <button class="send-btn">Enviar</button>
+    </div>
+
+</div>
+
+<script>
+
+function handleLogout() {
+    localStorage.removeItem('leiturar_token');
+    localStorage.removeItem('leiturar_user');
+    window.location.href = 'Login.html';
+}
+
+function toggleDropdown() {
+    const menu = document.getElementById("dropdownMenu");
+    menu.style.display = (menu.style.display === "flex") ? "none" : "flex";
+}
+
+window.addEventListener("click", function(e) {
+    const menu = document.getElementById("dropdownMenu");
+    const icon = document.querySelector(".menu-icon");
+
+    if (!menu.contains(e.target) && !icon.contains(e.target)) {
+        menu.style.display = "none";
+    }
+});
+
+/* ===== ENVIO DO EMAIL ===== */
+document.querySelector(".send-btn").addEventListener("click", async () => {
+    const email = document.querySelector(".email-input").value.trim();
+    const message = document.querySelector(".textarea-input").value.trim();
+
+    if (!email || !message) {
+        alert("Por favor, preencha seu email e a mensagem.");
+        return;
+    }
+
+    try {
+        const response = await fetch("http://localhost:4000/help/send", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, message })
+        });
+
+        if (response.ok) {
+            alert("📨 Email enviado com sucesso! Nossa equipe entrará em contato.");
+            document.querySelector(".email-input").value = "";
+            document.querySelector(".textarea-input").value = "";
+        } else {
+            alert("Erro ao enviar. Tente novamente mais tarde.");
+        }
+
+    } catch (err) {
+        console.error(err);
+        alert("Erro de conexão com o servidor.");
+    }
+});
+</script>
+
+
+</body>
+</html>
