@@ -94,49 +94,9 @@ PI-4-TIME-17-
 
 ---
 
-## ⚙️ Sistema de Recomendação de Livros por Tags (Python)
+## ⚙️ Integração Inteligência Artificial de Recomendação e Integgração ao Gemini
 
-O projeto conta com um microserviço em **Python (Flask)** responsável por recomendar livros com base nas preferências do usuário.
-
-### Como funciona
-
-- Cada livro possui uma lista de **tags** (ex: `"romance"`, `"aventura"`, `"clássico"`, `"infantil"`)
-- O usuário seleciona uma ou mais tags de interesse
-- O sistema retorna os livros que possuem tags em comum, **ordenados por relevância** (quanto mais tags em comum, maior a prioridade)
-
-### Endpoints disponíveis
-
-| Método | Endpoint | Descrição |
-|--------|----------|-----------|
-| `POST` | `/books/recommend` | Recebe tags e retorna livros recomendados (via backend TS) |
-| `GET` | `localhost:5000/tags` | Lista todas as tags disponíveis no banco |
-| `GET` | `localhost:5000/health` | Verifica se o serviço Python está rodando |
-
-### Exemplo de requisição
-
-```json
-POST /books/recommend
-{ "tags": ["romance", "brasileiro"] }
-```
-
-```json
-{
-  "tags_selecionadas": ["romance", "brasileiro"],
-  "total": 2,
-  "recomendacoes": [
-    { "titulo": "Vidas Secas", "score": 2, "tags_em_comum": ["romance", "brasileiro"] },
-    { "titulo": "Dom Casmurro", "score": 2, "tags_em_comum": ["romance", "brasileiro"] }
-  ]
-}
-```
-
-### Tags dos livros atuais
-
-| Livro | Tags |
-|-------|------|
-| O Mágico de Oz | `fantasia`, `aventura`, `clássico`, `domínio público`, `infantil`, `família` |
-| Vidas Secas | `romance`, `leitura obrigatória`, `realismo`, `brasileiro`, `drama`, `histórico`, `sertão` |
-| Dom Casmurro | `romance`, `leitura obrigatória`, `clássico`, `brasileiro`, `drama`, `ciúme`, `realismo` |
+Em Breve...
 
 ---
 
@@ -156,8 +116,9 @@ POST /books/recommend
 
 ### Pré-requisitos
 
-* **Node.js e NPM**
-* **Python 3.10+**
+* Java 17+
+* Maven
+* **Node.js e NPM/Yarn**
 * Conta no [MongoDB Atlas](https://www.mongodb.com/atlas)
 
 ### Passos
@@ -185,28 +146,7 @@ POST /books/recommend
    npm run dev # ou npm start
    ```
 
-3. **Configuração e Execução do Serviço de Recomendação (Python)**:
-
-   a. Acesse a pasta do serviço:
-   ```bash
-   cd PI-5_TIME-4-Backend/recommendation
-   ```
-   b. Instale as dependências:
-   ```bash
-   pip install -r requirements.txt
-   ```
-   c. Configure o `.env` com a URI do MongoDB:
-   ```bash
-   copy .env.example .env
-   # Abra o .env e preencha:
-   # MONGO_URI=mongodb+srv://usuario:senha@cluster.mongodb.net/leiturar
-   ```
-   d. Execute o serviço (porta 5000):
-   ```bash
-   python app.py
-   ```
-
-4. **Execução do Front-end**:
+3. **Execução do Front-end**:
 
    a. Acesse a pasta do front-end:
    ```bash
