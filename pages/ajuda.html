@@ -119,7 +119,7 @@ function toggleDropdown() {
     menu.style.display = (menu.style.display === "flex") ? "none" : "flex";
 }
 
-/* ===== INTEGRAÇÃO COM O BACKEND (GEMINI) ===== */
+/* ===== INTEGRAÇÃO COM O BACKEND (GEMINI STREAMING) ===== */
 document.getElementById("btn-ask").addEventListener("click", async () => {
     const promptInput = document.getElementById("user-prompt");
     const prompt = promptInput.value.trim();
@@ -132,34 +132,48 @@ document.getElementById("btn-ask").addEventListener("click", async () => {
         return;
     }
 
-    // Estado de carregamento
-    btn.innerText = "IA pensando...";
+    // Estado de carregamento inicial
+    btn.innerText = "IA processando...";
     btn.disabled = true;
-    responseContainer.style.display = "none";
+    answerDiv.innerText = ""; // Limpa a resposta anterior
+    responseContainer.style.display = "block"; // Já mostra o container para o texto surgir
 
     try {
         const response = await fetch("http://localhost:4000/help/ask", {
             method: "POST",
             headers: { 
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${localStorage.getItem('leiturar_token')}` // Enviando token se necessário
+                "Authorization": `Bearer ${localStorage.getItem('leiturar_token')}` 
             },
             body: JSON.stringify({ prompt })
         });
 
-        const data = await response.json();
-
-        if (response.ok) {
-            responseContainer.style.display = "block";
-            answerDiv.innerText = data.answer;
-            promptInput.value = ""; // Limpa o campo após sucesso
-        } else {
-            alert("Ocorreu um erro: " + (data.error || "Erro desconhecido"));
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || "Erro no servidor");
         }
+
+        // --- LÓGICA DE STREAMING ---
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break; // Acabou a resposta
+
+            // Decodifica o pedaço binário em texto e adiciona na div
+            const chunkText = decoder.decode(value, { stream: true });
+            answerDiv.innerText += chunkText;
+            
+            // Scroll automático para acompanhar o texto surgindo (opcional)
+            responseContainer.scrollTop = responseContainer.scrollHeight;
+        }
+
+        promptInput.value = ""; // Limpa o campo após o sucesso total
 
     } catch (err) {
         console.error(err);
-        alert("Erro de conexão com o servidor. Verifique se o Backend está rodando na porta 4000.");
+        alert("Erro: " + err.message);
     } finally {
         btn.innerText = "Perguntar ao Gemini";
         btn.disabled = false;
