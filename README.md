@@ -45,9 +45,8 @@ Com base na estrutura de arquivos, o projeto utiliza uma arquitetura de **micros
 | --------------------------------- | ----------------------------- | ----------------------------------------------------------------- |
 | **Front-end**                     | HTML, CSS, JavaScript         | Interface do usuário e lógica de apresentação.                      |
 | **Back-end Principal**            | **TypeScript/Node.js (Express)**| **Gestão de Usuários, Autenticação, Livros e Rotas principais**.    |
-| **Back-end de Correção**          | **Java (Spring Boot)**        | **Servidor exclusivo para a lógica de correção automática de questões.** |
 | **Banco de Dados**                | MongoDB Atlas                 | Armazenamento de usuários, livros e questões.                     |
-| **Gerenciamento de dependências** | Maven (Java), NPM/Yarn (Node) | Organização e build dos respectivos projetos de backend.            |
+| **Gerenciamento de dependências** | NPM/Yarn (Node)               | Organização e build dos respectivos projetos de backend.            |
 | **Design/Protótipo**              | Figma                         | Protótipos de interface e fluxo do usuário.                         |
 
 ---
@@ -94,7 +93,7 @@ PI-4-TIME-17-
 
 ---
 
-## ⚙️ Integração Inteligência Artificial de Recomendação e Integgração ao Gemini
+## ⚙️ Integração Inteligência Artificial de Recomendação e Integração ao Gemini
 
 Em Breve...
 
@@ -116,8 +115,6 @@ Em Breve...
 
 ### Pré-requisitos
 
-* Java 17+
-* Maven
 * **Node.js e NPM/Yarn**
 * Conta no [MongoDB Atlas](https://www.mongodb.com/atlas)
 
