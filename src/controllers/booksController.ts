@@ -1,7 +1,9 @@
 import { Request, Response } from 'express';
 import Book from '../models/Book'; 
 import Question from '../models/Question';
-import User from '../models/User'; 
+import { CorretorRequest } from '../models/Corretor';
+
+// Mapa para converter letras do gabarito em índices (0, 1, 2...)
 const letraParaIndice: Record<string, number> = { 'A': 0, 'B': 1, 'C': 2, 'D': 3 };
 
 const GABARITOS: Record<string, string[]> = {
@@ -12,11 +14,10 @@ const GABARITOS: Record<string, string[]> = {
 
 export async function corrigirRespostasController(req: Request, res: Response) {
   try {
-    // Adicionado o 'ra' no corpo da requisição para identificar o usuário[cite: 4, 14]
-    const { livro, respostas, ra }: { livro: string, respostas: string[], ra: string } = req.body;
+    const { livro, respostas }: { livro: string, respostas: string[] } = req.body;
 
-    if (!livro || !Array.isArray(respostas) || !ra) {
-      return res.status(400).json({ message: 'Dados inválidos (Livro, Respostas e RA são necessários)' });
+    if (!livro || !Array.isArray(respostas)) {
+      return res.status(400).json({ message: 'Dados inválidos' });
     }
 
     const gabaritoOficial = GABARITOS[livro];
@@ -25,42 +26,18 @@ export async function corrigirRespostasController(req: Request, res: Response) {
     let acertos = 0;
 
     respostas.forEach((respostaAluno, index) => {
+      // Pega a letra do gabarito oficial (ex: "C") e converte para índice (ex: 2)
       const letraCorreta = gabaritoOficial[index];
       const indiceCorreto = letraParaIndice[letraCorreta];
+
+      // Pega a letra que veio do frontend (ex: "C") e converte para índice (ex: 2)
       const indiceAluno = letraParaIndice[respostaAluno.toUpperCase()];
 
+      // Compara os índices
       if (indiceAluno === indiceCorreto) {
         acertos++;
       }
     });
-
-
-    if (acertos >= 3) {
-      const livroData = await Book.findById(livro);
-      const user = await User.findOne({ ra });
-
-      if (livroData && user) {
-        // Atualiza pontos baseados nas tags do livro
-        livroData.tags.forEach((tag, index) => {
-          // Tag principal (primeira) vale +2, secundárias valem +1
-          const peso = (index === 0) ? 2 : 1;
-          const interesseExistente = user.interesses.find(i => i.tag === tag);
-
-          if (interesseExistente) {
-            interesseExistente.pontos += peso;
-          } else {
-            user.interesses.push({ tag, pontos: peso });
-          }
-        });
-
-        // Adiciona à lista de lidos para o algoritmo não recomendar o mesmo livro[cite: 11]
-        if (!user.livrosLidos.includes(livro)) {
-          user.livrosLidos.push(livro);
-        }
-
-        await user.save(); // Persiste a evolução do gosto no MongoDB[cite: 13]
-      }
-    }
 
     return res.json({ 
       acertos, 
@@ -70,30 +47,34 @@ export async function corrigirRespostasController(req: Request, res: Response) {
 
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: 'Erro ao processar correção e recomendação' });
+    return res.status(500).json({ message: 'Erro ao processar correção' });
   }
 }
+
+// ... manter as outras funções (listBooks, getQuestions) como estavam
 
 export async function listBooksController(req: Request, res: Response) {
   try {
     const books = await Book.find({});
     return res.json(books);
   } catch (err) {
+    console.error(err);
     return res.status(500).json({ message: 'erro' });
   }
 }
 
 export async function addBookController(req: Request, res: Response) {
   try {
-    const { id, titulo, autor, tags } = req.body; 
+    const { id, titulo, autor } = req.body;
     if (!id || !titulo) return res.status(400).json({ message: 'id e titulo obrigatórios' });
 
     const existing = await Book.findById(id);
     if (existing) return res.status(409).json({ message: 'livro já existe' });
 
-    const book = await Book.create({ _id: id, titulo, autor, tags });
+    const book = await Book.create({ _id: id, titulo, autor });
     return res.status(201).json(book);
   } catch (err) {
+    console.error(err);
     return res.status(500).json({ message: 'erro' });
   }
 }
@@ -104,6 +85,7 @@ export async function getBookQuestionsController(req: Request, res: Response) {
     const questions = await Question.find({ idLivro: bookId });
     return res.json(questions);
   } catch (err) {
+    console.error(err);
     return res.status(500).json({ message: 'erro' });
   }
 }
@@ -118,6 +100,9 @@ export async function addQuestionController(req: Request, res: Response) {
     const q = await Question.create({ idLivro: bookId, pergunta, alternativas, correta });
     return res.status(201).json(q);
   } catch (err) {
+    console.error(err);
     return res.status(500).json({ message: 'erro' });
   }
 }
+
+

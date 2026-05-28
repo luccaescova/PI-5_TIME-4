@@ -18,42 +18,49 @@ export async function askGeminiHelp(req: Request, res: Response) {
     try {
         const { prompt } = req.body;
 
-        // 1. Aqui você poderia buscar os nomes dos livros no seu MongoDB
-        // const livrosNoBanco = await Livro.find().select('titulo');
-        const livrosDisponiveis = "Vidas Secas, Dom Casmurro, O Mágico de Oz"; // Exemplo manual
+        // 1. Definição do Acervo (Ideal buscar do MongoDB depois)
+        const livrosDisponiveis = "Vidas Secas, Dom Casmurro, O Mágico de Oz";
 
+        // 2. Configuração do Modelo com as Instruções de Sistema (O "Cérebro" da IA)
         const model = genAI.getGenerativeModel({ 
-    model: "gemini-2.5-flash",
-    systemInstruction: `
-        Você é o "BiblioBot", o assistente especializado do projeto Leiturar. 
-        
-        SUA MISSÃO:
-        Ajudar alunos com informações sobre livros, autores, resumos e análise literária.
-        
-        DIRETRIZES:
-        1. Se perguntarem sobre autores (ex: Machado de Assis, Guimarães Rosa), responda com detalhes biográficos e mencione suas principais obras.
-        2. Se a pergunta for sobre um livro específico do acervo (Dom Casmurro, Vidas Secas, O Mágico de Oz), forneça análises profundas.
-        3. Você tem permissão para falar sobre literatura universal e brasileira de forma ampla.
-        
-        BLOQUEIO DE SEGURANÇA:
-        - Recuse APENAS perguntas que não tenham NADA a ver com educação ou leitura (ex: "como consertar um pneu", "receita de bolo", "previsão do tempo").
-        - Nesses casos, diga: "Como assistente do Leiturar, meu foco é te ajudar com o mundo dos livros e da literatura. Posso te ajudar com alguma dúvida sobre autores ou obras?"
-    `
-});
+            model: "gemini-2.5-flash",
+            systemInstruction: `
+                Você é o "BiblioBot", o assistente especializado do projeto Leiturar. 
+                Sua missão é ajudar alunos com informações sobre livros, autores e literatura.
+                
+                DIRETRIZES:
+                1. Fale sobre autores, obras e contexto literário de forma ampla.
+                2. Dê atenção especial aos livros do acervo: ${livrosDisponiveis}.
+                3. Se o assunto não for literatura/educação, recuse educadamente.
+            `
+        });
 
-        // 2. Criamos um "super prompt" que limita a IA
-        const superPrompt = `
-            Contexto do Acervo: Os livros disponíveis atualmente são: ${livrosDisponiveis}.
-            Pergunta do Usuário: ${prompt}
-            
-            Lembre-se: Se a pergunta não for sobre livros, recuse.
-        `;
+        // 3. Montagem do Prompt de contexto
+        const superPrompt = `Pergunta do Usuário: ${prompt}`;
 
-        const result = await model.generateContent(superPrompt);
-        const text = result.response.text();
+        // 4. MUDANÇA PARA STREAM: Iniciando a geração aos poucos
+        const result = await model.generateContentStream(superPrompt);
 
-        res.json({ answer: text });
+        // 5. Configuração dos Headers para o Navegador aceitar o Stream
+        res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+        res.setHeader('Transfer-Encoding', 'chunked');
+
+        // 6. Loop que envia cada "pedaço" (chunk) da resposta assim que chega do Google
+        for await (const chunk of result.stream) {
+            const chunkText = chunk.text();
+            res.write(chunkText); // Escreve o pedaço no corpo da resposta HTTP
+        }
+
+        // 7. Finaliza a conexão
+        res.end();
+
     } catch (error) {
-        // ... erro ...
+        console.error("Erro no Stream do Gemini:", error);
+        // Se der erro, precisamos fechar a conexão para o front não ficar esperando
+        if (!res.headersSent) {
+            res.status(500).json({ error: "Erro ao processar sua dúvida." });
+        } else {
+            res.end();
+        }
     }
 }

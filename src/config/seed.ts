@@ -21,16 +21,13 @@ export default async function seedDatabase() {
   }
 
   // cria livro magico_oz
-const bookId = 'magico_oz';
+  const bookId = 'magico_oz';
   const existingBook = await Book.findById(bookId);
   if (!existingBook) {
-    await Book.create({ 
-      _id: bookId, 
-      titulo: 'O Mágico de Oz', 
-      autor: 'L. Frank Baum',
-      tags: ['Fantasia', 'Aventura', 'Infantil', 'Jornada'] // <-- ADICIONADO
-    });
-    console.log('✓ livro seed criado com tags:', bookId);
+    await Book.create({ _id: bookId, titulo: 'O Mágico de Oz', autor: 'L. Frank Baum' });
+    console.log('✓ livro seed criado:', bookId);
+  } else {
+    console.log('livro seed já existe');
   }
 
   // questões do mágico de oz (não duplicar)
@@ -103,15 +100,17 @@ const bookId = 'magico_oz';
     // ===== LIVRO: Vidas Secas =====
 
   const bookId2 = 'vidas_secas';
+
   const existingBook2 = await Book.findById(bookId2);
   if (!existingBook2) {
     await Book.create({
       _id: bookId2,
       titulo: 'Vidas Secas',
-      autor: 'Graciliano Ramos',
-      tags: ['Regionalismo', 'Drama', 'Clássico', 'Realismo'] // <-- ADICIONADO
+      autor: 'Graciliano Ramos'
     });
-    console.log('✓ livro seed criado com tags:', bookId2);
+    console.log('✓ livro seed criado:', bookId2);
+  } else {
+    console.log('livro seed já existe:', bookId2);
   }
 
   // questões de Vidas Secas
@@ -186,15 +185,17 @@ const bookId = 'magico_oz';
     // ===== LIVRO: Dom Casmurro =====
 
   const bookId3 = 'dom_casmurro';
+
   const existingBook3 = await Book.findById(bookId3);
   if (!existingBook3) {
     await Book.create({
       _id: bookId3,
       titulo: 'Dom Casmurro',
-      autor: 'Machado de Assis',
-      tags: ['Realismo', 'Romance', 'Clássico', 'Análise Psicológica'] // <-- ADICIONADO
+      autor: 'Machado de Assis'
     });
-    console.log('✓ livro seed criado com tags:', bookId3);
+    console.log('✓ livro seed criado:', bookId3);
+  } else {
+    console.log('livro seed já existe:', bookId3);
   }
 
   // questões de Dom Casmurro
