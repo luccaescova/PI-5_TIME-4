@@ -17,7 +17,8 @@
 
     .container {
         background-color: #C9FF8F;
-        width: 1000px;
+        width: 1200px;
+        max-width: 100%;
         min-height: 100vh;
         border-radius: 10px;
         overflow: hidden;
@@ -100,28 +101,22 @@
     }
 
     .books-grid {
-        display: flex;
-        justify-content: center;   /* centraliza */
-        align-items: flex-start;    /* alinha no topo */
-        gap: 40px;                  /* espaço entre os cards */
-        flex-wrap: nowrap;          /* impede quebrar linha */
-    }
-
-    .books-row {
-        display: flex;
-        justify-content: space-between;
-        gap: 20px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+        gap: 22px;
+        align-items: flex-start;
     }
 
     .book {
-        width: 30%;
         background-color: #C9FF8F;
         border: 2px solid #7cd957;
         border-radius: 10px;
-        padding: 15px;
+        padding: 12px;
         text-align: center;
         cursor: pointer;
         transition: 0.15s;
+        display: flex;
+        flex-direction: column;
     }
 
     .book:hover {
@@ -130,10 +125,17 @@
 
     .book img {
         width: 100%;
-        height: 230px;
+        height: 220px;
         object-fit: cover;
         border-radius: 8px;
         border: 1px solid #000;
+        background: #eee;
+    }
+
+    .book-author {
+        font-size: 12px;
+        color: #333;
+        margin-top: 4px;
     }
 
     .book-title {
@@ -312,6 +314,12 @@
         }
     }
 
+    function escapeHtml(s) {
+        return String(s || '').replace(/[&<>"']/g, c => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        })[c]);
+    }
+
     /* ===== RENDERIZAR LIVROS ===== */
     function renderBooks(books) {
         booksGrid.innerHTML = "";
@@ -324,25 +332,37 @@
         const favs = JSON.parse(localStorage.getItem("favoritos") || "[]");
 
         books.forEach(book => {
-            const imageUrl = `img/${book._id}.jpg`;
+            // capa: preferir coverUrl do backend (Gutenberg), fallback img/<id>.jpg (livros antigos)
+            const imageUrl = book.coverUrl || `img/${book._id}.jpg`;
+            const isFav = favs.includes(book._id);
 
             booksGrid.innerHTML += `
-                <div class="book" onclick="openBookPopup('${book._id}', '${book.titulo}')">
-                    <img src="${imageUrl}" alt="Capa" 
-                        onerror="this.src='https://placehold.co/230x300/cccccc/000?text=Capa+Indisponível'">
-                    <div class="book-title">${book.titulo} ${favs.includes(book._id) ? "⭐" : ""}</div>
+                <div class="book" onclick="openBookPopup('${book._id}')">
+                    <img src="${imageUrl}" alt="Capa"
+                        onerror="this.src='https://placehold.co/170x220/cccccc/000?text=Sem+capa'">
+                    <div class="book-title">${escapeHtml(book.titulo)} ${isFav ? "⭐" : ""}</div>
+                    <div class="book-author">${escapeHtml(book.autor || '')}</div>
                 </div>
             `;
         });
     }
 
     /* ===== POPUP DO LIVRO ===== */
-    function openBookPopup(id, title) {
-        document.getElementById("popupTitle").innerText = title;
+    function openBookPopup(id) {
+        const book = allBooks.find(b => b._id === id);
+        if (!book) return;
+
+        document.getElementById("popupTitle").innerText = book.titulo;
         document.getElementById("popupBg").style.display = "flex";
 
         document.getElementById("btnLer").onclick = () => {
-            window.location.href = `pdfs/${id}.pdf`;
+            // se o livro tem versão HTML (Gutenberg ou PDF-convertido), abre o leitor novo;
+            // caso contrário cai no PDF antigo
+            if (book.htmlUrl) {
+                window.location.href = `reader.html?id=${encodeURIComponent(id)}`;
+            } else {
+                window.location.href = `pdfs/${id}.pdf`;
+            }
         };
 
         document.getElementById("btnQuestoes").onclick = () => {

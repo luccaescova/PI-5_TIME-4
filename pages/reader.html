@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leiturar – Leitor</title>
+<style>
+    * { box-sizing: border-box; }
+
+    html, body {
+        margin: 0;
+        height: 100%;
+        font-family: Arial, sans-serif;
+        background-color: #1E1E1E;
+        color: #222;
+    }
+
+    .reader-shell {
+        display: grid;
+        grid-template-rows: 60px 1fr;
+        height: 100vh;
+    }
+
+    /* ===== TOPO ===== */
+    .reader-header {
+        background-color: #C9FF8F;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 20px;
+        border-bottom: 2px solid #000;
+    }
+
+    .reader-header .left {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+    }
+
+    .reader-header button.back {
+        background: #7CD957;
+        border: 2px solid #000;
+        border-radius: 6px;
+        padding: 6px 14px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    .reader-header button.back:hover { background: #6cc44a; }
+
+    .reader-header .title {
+        font-size: 20px;
+        font-weight: bold;
+        color: #000;
+    }
+
+    .reader-header .author {
+        font-size: 13px;
+        color: #333;
+    }
+
+    /* ===== CORPO: SIDEBAR + ÁREA DE LEITURA ===== */
+    .reader-body {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        min-height: 0;
+    }
+
+    .sidebar {
+        background-color: #C9FF8F;
+        border-right: 2px solid #000;
+        overflow-y: auto;
+        padding: 16px 0;
+    }
+
+    .sidebar h3 {
+        margin: 0 16px 12px;
+        font-size: 16px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .sidebar ol {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .sidebar li {
+        padding: 10px 16px;
+        cursor: pointer;
+        border-bottom: 1px solid rgba(0,0,0,0.15);
+        font-size: 14px;
+        line-height: 1.3;
+        transition: background 0.15s;
+    }
+
+    .sidebar li:hover { background-color: #b7f07d; }
+    .sidebar li.active { background-color: #7CD957; font-weight: bold; }
+
+    .sidebar .empty {
+        padding: 16px;
+        font-size: 13px;
+        color: #555;
+        font-style: italic;
+    }
+
+    .reading-area {
+        background: #fff;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .reading-area iframe {
+        width: 100%;
+        height: 100%;
+        border: 0;
+        background: #fff;
+    }
+
+    .loading, .error {
+        padding: 40px;
+        text-align: center;
+        color: #444;
+    }
+    .error { color: #b00; }
+</style>
+</head>
+<body>
+
+<div class="reader-shell">
+    <header class="reader-header">
+        <div class="left">
+            <button class="back" onclick="window.location.href='menu.html'">← Voltar</button>
+            <div>
+                <div class="title" id="bookTitle">Carregando…</div>
+                <div class="author" id="bookAuthor"></div>
+            </div>
+        </div>
+        <div class="logo" style="font-weight: bold; font-size: 22px;">Leiturar</div>
+    </header>
+
+    <div class="reader-body">
+        <aside class="sidebar">
+            <h3>Capítulos</h3>
+            <ol id="chapterList">
+                <li class="empty">Carregando capítulos…</li>
+            </ol>
+        </aside>
+
+        <main class="reading-area">
+            <div class="loading" id="loadingMsg">Carregando livro…</div>
+            <iframe id="bookFrame" style="display:none"></iframe>
+        </main>
+    </div>
+</div>
+
+<script>
+    const API_URL = 'http://localhost:4000';
+
+    function qs(name) {
+        return new URLSearchParams(window.location.search).get(name);
+    }
+
+    function showError(msg) {
+        document.getElementById('loadingMsg').className = 'error';
+        document.getElementById('loadingMsg').innerText = msg;
+    }
+
+    async function init() {
+        const token = localStorage.getItem('leiturar_token');
+        if (!token) {
+            window.location.href = 'Login.html';
+            return;
+        }
+
+        const bookId = qs('id');
+        if (!bookId) {
+            showError('ID do livro não informado.');
+            return;
+        }
+
+        // buscar dados do livro pelo /books (poderia ser /books/:id mas a rota não existe)
+        let book;
+        try {
+            const res = await fetch(`${API_URL}/books`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const books = await res.json();
+            book = books.find(b => b._id === bookId);
+        } catch (err) {
+            showError('Erro de conexão com o servidor.');
+            return;
+        }
+
+        if (!book) {
+            showError('Livro não encontrado.');
+            return;
+        }
+
+        if (!book.htmlUrl) {
+            showError('Esse livro ainda não tem versão HTML disponível.');
+            return;
+        }
+
+        document.getElementById('bookTitle').innerText = book.titulo;
+        document.getElementById('bookAuthor').innerText = book.autor || '';
+        document.title = `Leiturar – ${book.titulo}`;
+
+        // baixa o HTML via fetch (CORS liberado no backend), injeta <base href>
+        // para que imagens/links relativos resolvam contra o backend, e renderiza
+        // via srcdoc — assim a iframe é same-origin e podemos ler seu DOM.
+        let html;
+        try {
+            const r = await fetch(book.htmlUrl);
+            html = await r.text();
+        } catch (err) {
+            showError('Erro ao baixar o conteúdo do livro.');
+            return;
+        }
+
+        const baseHref = book.htmlUrl.replace(/[^/]+$/, '');
+        const baseTag = `<base href="${baseHref}">`;
+        if (/<head[^>]*>/i.test(html)) {
+            html = html.replace(/<head([^>]*)>/i, `<head$1>${baseTag}`);
+        } else {
+            html = baseTag + html;
+        }
+
+        const frame = document.getElementById('bookFrame');
+        frame.addEventListener('load', () => {
+            document.getElementById('loadingMsg').style.display = 'none';
+            frame.style.display = 'block';
+            buildChapters(frame);
+        }, { once: true });
+        frame.srcdoc = html;
+    }
+
+    function buildChapters(frame) {
+        const list = document.getElementById('chapterList');
+        list.innerHTML = '';
+
+        let doc;
+        try {
+            doc = frame.contentDocument || frame.contentWindow.document;
+        } catch (err) {
+            list.innerHTML = '<li class="empty">Não foi possível ler a estrutura do livro.</li>';
+            return;
+        }
+
+        // estratégia: pegar headings dentro de div.chapter (padrão Gutenberg)
+        // fallback: pegar h2/h3 com id ou âncora dentro
+        let headings = Array.from(doc.querySelectorAll('div.chapter > h2, div.chapter > h1, div.chapter > h3'));
+
+        if (headings.length === 0) {
+            headings = Array.from(doc.querySelectorAll('h2, h3'))
+                .filter(h => h.id || h.querySelector('a[id]'));
+        }
+
+        if (headings.length === 0) {
+            list.innerHTML = '<li class="empty">Sem capítulos detectados.</li>';
+            return;
+        }
+
+        headings.forEach((h, idx) => {
+            // garantir um id para scrollIntoView
+            let id = h.id;
+            if (!id) {
+                const a = h.querySelector('a[id]');
+                if (a) id = a.id;
+            }
+            if (!id) {
+                id = `__chap_${idx}`;
+                h.id = id;
+            }
+
+            const li = document.createElement('li');
+            li.innerText = (h.innerText || h.textContent || `Capítulo ${idx + 1}`)
+                .trim().replace(/\s+/g, ' ').slice(0, 80);
+            li.addEventListener('click', () => {
+                const target = doc.getElementById(id);
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                document.querySelectorAll('.sidebar li.active').forEach(el => el.classList.remove('active'));
+                li.classList.add('active');
+            });
+            list.appendChild(li);
+        });
+    }
+
+    window.onload = init;
+</script>
+
+</body>
+</html>

@@ -308,11 +308,11 @@
             const book = allBooks.find(b => b._id === id);
             if (!book) return;
 
-            const imageUrl = `img/${book._id}.jpg`;
+            const imageUrl = book.coverUrl || `img/${book._id}.jpg`;
 
             booksList.innerHTML += `
                 <div class="book" onclick="openFavPopup('${book._id}')">
-                    <img src="${imageUrl}" 
+                    <img src="${imageUrl}"
                         onerror="this.src='https://placehold.co/230x300/cccccc/000?text=Capa+Indisponível'">
                     <div class="book-title">${book.titulo} ${favorites.includes(book._id) ? "⭐" : ""}</div>
                 </div>
@@ -332,7 +332,11 @@
         document.getElementById("popupBg").style.display = "flex";
 
         document.getElementById("btnLer").onclick = () => {
-            window.location.href = `pdfs/${bookId}.pdf`;
+            if (book.htmlUrl) {
+                window.location.href = `reader.html?id=${encodeURIComponent(bookId)}`;
+            } else {
+                window.location.href = `pdfs/${bookId}.pdf`;
+            }
         };
 
         document.getElementById("btnQuestoes").onclick = () => {
@@ -366,10 +370,10 @@
         booksList.innerHTML = "";
 
         filtered.forEach(book => {
-            const imageUrl = `img/${book._id}.jpg`;
+            const imageUrl = book.coverUrl || `img/${book._id}.jpg`;
             booksList.innerHTML += `
                 <div class="book" onclick="openFavPopup('${book._id}')">
-                    <img src="${imageUrl}" 
+                    <img src="${imageUrl}"
                         onerror="this.src='https://placehold.co/230x300/cccccc/000?text=Capa+Indisponível'">
                     <div class="book-title">${book.titulo} ${favorites.includes(book._id) ? "⭐" : ""}</div>
                 </div>
