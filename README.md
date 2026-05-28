@@ -140,6 +140,65 @@ POST /books/recommend
 
 ---
 
+## 📦 Importação do Dataset de Livros
+
+O backend agora serve **HTML estático** dos livros (em vez de PDF) para o leitor com sumário lateral. O fluxo tem duas fontes:
+
+1. **Dataset Project Gutenberg** — arquivo `livros_gutenberg_zip.zip` com ~46 livros clássicos em HTML.
+2. **3 PDFs em português** já existentes no frontend (`pages/pdfs/dom_casmurro.pdf`, `magico_oz.pdf`, `vidas_secas.pdf`) — convertidos automaticamente para HTML estruturado por capítulos.
+
+### Variáveis de ambiente extras
+
+Adicione ao `.env`:
+
+```bash
+# base usada nas URLs salvas no MongoDB (capa + html dos livros)
+PUBLIC_BASE_URL=http://localhost:4000
+
+# caminho ABSOLUTO do ZIP do dataset Gutenberg (qualquer pasta local)
+BOOKS_ZIP_PATH=C:\caminho\para\livros_gutenberg_zip.zip
+
+# (opcional) caminho da pasta `pages/` do frontend, usado para localizar
+# os PDFs e as capas. Default: ../PI-5_TIME-4-Frontend/pages
+FRONTEND_PAGES_DIR=C:\caminho\para\PI-5_TIME-4-Frontend\pages
+```
+
+### Scripts
+
+```bash
+# 1x — descompacta o ZIP do Gutenberg em public/books/<slug>/ e popula o Mongo
+npm run extract-books
+
+# 1x — converte os 3 PDFs (dom_casmurro, magico_oz, vidas_secas) em HTML
+#      e atualiza os mesmos registros do Mongo com htmlUrl + coverUrl
+npm run convert-pdfs
+```
+
+Após rodar os dois, a coleção `books` no MongoDB terá ~47 livros com os campos:
+
+| Campo       | Exemplo                                                                |
+| ----------- | ---------------------------------------------------------------------- |
+| `_id`       | `dom_casmurro`, `dracula`, `the-great-gatsby`                          |
+| `titulo`    | `Dom Casmurro`                                                         |
+| `autor`     | `Machado de Assis`                                                     |
+| `coverUrl`  | `http://localhost:4000/books-content/dom_casmurro/cover.jpg`           |
+| `htmlUrl`   | `http://localhost:4000/books-content/dom_casmurro/index.html`          |
+| `fonte`     | `gutenberg` ou `pdf-convertido`                                         |
+
+### Endpoint estático
+
+O Express monta os arquivos extraídos em:
+
+```
+GET /books-content/<slug>/index.html
+GET /books-content/<slug>/cover.jpg
+GET /books-content/<slug>/images/...
+```
+
+A pasta `public/books/` é gerada localmente pelos scripts acima e está no `.gitignore` (~400MB).
+
+---
+
 ## 🧩 Estrutura do Banco de Dados
 
 | Coleção         | Campos principais                                   | Descrição                                  |
@@ -173,17 +232,26 @@ POST /books/recommend
    ```bash
    cd leiturar/BACKEND
    ```
-   b. Instale as dependências e configure o arquivo `.env` com sua URI do MongoDB.
-   ```bash
-   npm install
-   # Exemplo de conteúdo do .env:
-   # MONGO_URI=mongodb+srv://usuario:senha@cluster.mongodb.net/leiturar
-   # PORT=3000
-   ```
-   c. Execute o servidor (o comando pode variar, mas geralmente é):
-   ```bash
-   npm run dev # ou npm start
-   ```
+
+   b. Instale as dependências e configure o arquivo `.env`:
+   ```bash
+   npm install
+   # Exemplo de conteúdo do .env:
+   # MONGO_URI=mongodb://127.0.0.1:27017/leiturar
+   # PORT=4000
+   # JWT_SECRET=alguma_string_aleatoria
+   # PUBLIC_BASE_URL=http://localhost:4000
+   # BOOKS_ZIP_PATH=C:\caminho\para\livros_gutenberg_zip.zip
+   ```
+   c. Importe os livros (apenas na primeira execução):
+   ```bash
+   npm run extract-books   # ~30s, descompacta o dataset Gutenberg
+   npm run convert-pdfs    # converte os 3 PDFs em português em HTML
+   ```
+   d. Execute o servidor:
+   ```bash
+   npm run dev # ou npm start
+   ```
 
 3. **Configuração e Execução do Serviço de Recomendação (Python)**:
 
