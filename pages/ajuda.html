@@ -6,71 +6,208 @@
 <title>Leiturar – Suporte IA</title>
 
 <style>
-    /* ... (Mantive seus estilos originais de body, container, header e dropdown) ... */
-    body { margin: 0; font-family: Arial, sans-serif; background-color: #1E1E1E; display: flex; justify-content: center; }
-    .container { background-color: #C9FF8F; width: 1000px; min-height: 100vh; border-radius: 10px; overflow: hidden; position: relative; }
-    header { display: flex; align-items: center; justify-content: space-between; padding: 25px 35px; background-color: #C9FF8F; }
-    .left-area { display: flex; align-items: center; gap: 25px; }
-    .menu-icon { width: 35px; height: 10px; background-color: black; position: relative; cursor: pointer; }
-    .menu-icon::before, .menu-icon::after { content: ""; width: 35px; height: 10px; background-color: black; position: absolute; left: 0; }
-    .menu-icon::before { top: -8px; } .menu-icon::after { top: 8px; }
-    .logo { font-size: 28px; font-weight: bold; color: black; }
-    .dropdown-menu { position: absolute; top: 75px; left: 35px; background-color: #C9FF8F; border: 2px solid black; border-radius: 8px; display: none; flex-direction: column; width: 180px; z-index: 1000; }
-    .dropdown-menu button { padding: 12px; background: #C9FF8F; border: none; border-bottom: 2px solid black; cursor: pointer; font-weight: bold; text-align: left; }
-    
-    /* CONTENT AJUSTADO PARA IA */
-    .content {
-        background-color: white;
-        width: 90%;
-        margin: 30px auto;
-        padding: 30px;
-        border-radius: 10px;
-        border: 1px solid #000;
+    /* Reset e Configuração da Tela Cheia */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    }
+
+    body { 
+        background-color: #1C3B3B; /* Seu verde escuro base */
+        width: 100vw;
+        height: 100vh;
+        display: flex; 
+        justify-content: center; 
+        align-items: center;
+        overflow: hidden;
+        padding: 20px;
+    }
+
+    /* Container Principal Estilo Neobrutalista Moderno */
+    .container { 
+        background-color: #C9FF8F; /* O verde limão original em harmonia */
+        width: 100%;
+        max-width: 900px; 
+        height: 90vh;
+        border: 4px solid #000000;
+        border-radius: 16px; 
+        overflow: hidden; 
+        position: relative; 
+        box-shadow: 10px 10px 0px #000000; /* Sombra sólida marcante */
         display: flex;
         flex-direction: column;
     }
 
-    .section-title { font-size: 26px; font-weight: bold; color: #333; margin-bottom: 10px; }
-    .section-text { font-size: 16px; color: #444; margin-bottom: 25px; }
-
-    .textarea-input {
-        width: 100%;
-        height: 100px;
-        padding: 12px;
-        font-size: 15px;
-        border: 2px solid #000;
-        border-radius: 8px;
-        resize: none;
-        margin-bottom: 15px;
-        box-sizing: border-box;
+    /* Header Limpo e Alinhado */
+    header { 
+        display: flex; 
+        align-items: center; 
+        justify-content: space-between; 
+        padding: 20px 30px; 
+        background-color: #C9FF8F; 
+        border-bottom: 4px solid #000000;
     }
 
-    .send-btn {
-        width: 100%;
-        padding: 12px;
-        background-color: #7CD957;
-        border: 2px solid #000;
-        border-radius: 8px;
-        font-size: 18px;
-        font-weight: bold;
-        cursor: pointer;
+    .left-area { display: flex; align-items: center; gap: 20px; }
+    
+    /* Ícone Hamburger mais moderno */
+    .menu-icon { 
+        width: 30px; 
+        height: 4px; 
+        background-color: black; 
+        position: relative; 
+        cursor: pointer; 
+    }
+    .menu-icon::before, .menu-icon::after { 
+        content: ""; 
+        width: 30px; 
+        height: 4px; 
+        background-color: black; 
+        position: absolute; 
+        left: 0; 
         transition: 0.2s;
     }
+    .menu-icon::before { top: -8px; } 
+    .menu-icon::after { top: 8px; }
 
-    .send-btn:disabled { background-color: #ccc; cursor: not-allowed; }
+    .logo { 
+        font-size: 24px; 
+        font-weight: 900; 
+        color: black; 
+        text-transform: uppercase;
+        letter-spacing: -1px;
+    }
 
-    /* ÁREA DE RESPOSTA DA IA */
+    /* Dropdown Estilizado */
+    .dropdown-menu { 
+        position: absolute; 
+        top: 75px; 
+        left: 30px; 
+        background-color: #ffffff; 
+        border: 3px solid black; 
+        border-radius: 8px; 
+        display: none; 
+        flex-direction: column; 
+        width: 180px; 
+        z-index: 1000; 
+        box-shadow: 4px 4px 0px #000000;
+    }
+    .dropdown-menu button { 
+        padding: 12px; 
+        background: none; 
+        border: none; 
+        border-bottom: 2px solid black; 
+        cursor: pointer; 
+        font-weight: bold; 
+        text-align: left; 
+        transition: background 0.1s;
+    }
+    .dropdown-menu button:last-child { border-bottom: none; }
+    .dropdown-menu button:hover { background-color: #C9FF8F; }
+    
+    /* Área de Conteúdo Interno com Rolagem Fluida se necessário */
+    .content {
+        background-color: white;
+        flex: 1;
+        margin: 25px;
+        padding: 30px;
+        border-radius: 12px;
+        border: 3px solid #000;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        box-shadow: 4px 4px 0px #000000;
+    }
+
+    .section-title { 
+        font-size: 28px; 
+        font-weight: 900; 
+        color: #000; 
+        margin-bottom: 8px; 
+        text-transform: uppercase;
+    }
+    .section-text { font-size: 15px; color: #333; margin-bottom: 20px; font-weight: 500; }
+
+    /* Textarea Responsivo */
+    .textarea-input {
+        width: 100%;
+        min-height: 100px;
+        max-height: 150px;
+        padding: 15px;
+        font-size: 16px;
+        font-weight: 600;
+        border: 3px solid #000;
+        border-radius: 8px;
+        resize: vertical;
+        margin-bottom: 20px;
+        box-sizing: border-box;
+        outline: none;
+        transition: 0.1s;
+    }
+    .textarea-input:focus {
+        box-shadow: 4px 4px 0px #000000;
+        transform: translate(-2px, -2px);
+    }
+
+    /* Botão de Envio Neobrutalista */
+    .send-btn {
+        width: 100%;
+        padding: 16px;
+        background-color: #7CD957; /* Verde vivo original */
+        border: 3px solid #000;
+        border-radius: 8px;
+        font-size: 18px;
+        font-weight: 800;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.1s ease;
+        box-shadow: 4px 4px 0px #000000;
+    }
+    .send-btn:hover {
+        transform: translate(-2px, -2px);
+        box-shadow: 6px 6px 0px #000000;
+        background-color: #8ce666;
+    }
+    .send-btn:active {
+        transform: translate(4px, 4px);
+        box-shadow: 0px 0px 0px #000000;
+    }
+    .send-btn:disabled { 
+        background-color: #ccc; 
+        cursor: not-allowed; 
+        transform: none !important;
+        box-shadow: none !important;
+    }
+
+    /* Janela de Resposta da IA Renovada */
     #ai-response-container {
         margin-top: 25px;
         padding: 20px;
-        background-color: #f9f9f9;
-        border-left: 5px solid #7CD957;
-        border-radius: 4px;
-        display: none; /* Escondido até ter uma resposta */
+        background-color: #f3f4f6;
+        border: 3px solid #000000;
+        border-radius: 8px;
+        display: none; 
+        box-shadow: 4px 4px 0px #000000;
     }
 
-    .ai-label { font-weight: bold; color: #2b4d1f; margin-bottom: 8px; display: block; }
-    .ai-text { font-size: 15px; line-height: 1.6; color: #333; white-space: pre-wrap; }
+    .ai-label { 
+        font-size: 14px;
+        font-weight: 800; 
+        color: #000; 
+        text-transform: uppercase;
+        margin-bottom: 10px; 
+        display: block; 
+        letter-spacing: 0.5px;
+    }
+    .ai-text { 
+        font-size: 15px; 
+        line-height: 1.6; 
+        color: #111; 
+        font-weight: 500;
+        white-space: pre-wrap; 
+    }
 </style>
 </head>
 
@@ -100,7 +237,7 @@
         <button class="send-btn" id="btn-ask">Perguntar ao Gemini</button>
 
         <div id="ai-response-container">
-            <span class="ai-label">Resposta do Leiturar:</span>
+            <span class="ai-label">⚡ Resposta do Leiturar:</span>
             <div class="ai-text" id="ai-answer"></div>
         </div>
     </div>
