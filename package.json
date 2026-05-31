@@ -1,0 +1,40 @@
+{
+  "name": "leiturar-backend-ts",
+  "version": "1.0.0",
+  "description": "Backend em TypeScript para Leiturar (login RA + sistema de questões)",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only --ignore-watch public src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "extract-books": "ts-node --transpile-only src/scripts/extractBooks.ts",
+    "convert-pdfs": "ts-node --transpile-only src/scripts/convertPdfsToHtml.ts"
+  },
+  "author": "Equipe Leiturar",
+  "license": "MIT",
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "@types/adm-zip": "^0.5.8",
+    "@types/pdf-parse": "^1.1.5",
+    "adm-zip": "^0.5.17",
+    "bcrypt": "^5.1.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0",
+    "mongoose": "^7.0.0",
+    "nodemailer": "^7.0.11",
+    "pdf-parse": "^2.4.5",
+    "resend": "^6.5.2"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.0",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^4.17.17",
+    "@types/jsonwebtoken": "^9.0.2",
+    "@types/node": "^20.0.0",
+    "@types/nodemailer": "^7.0.4",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.0.0"
+  }
+}

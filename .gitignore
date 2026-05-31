@@ -1,0 +1,11 @@
+node_modules/
+
+# segredos locais
+.env
+.env.local
+
+# arquivos extraídos do dataset (gerados em runtime)
+public/books/
+
+# build do TypeScript
+dist/
