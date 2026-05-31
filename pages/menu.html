@@ -305,6 +305,74 @@
     .dropdown-menu button:last-child:hover {
         background-color: #ff5252;
     }
+
+    /* ====== CARROSSEL ESTILO NETFLIX ====== */
+    .carousel-wrapper {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .carousel-row {
+        display: flex;
+        gap: 22px;
+        overflow-x: auto;
+        scroll-behavior: smooth;
+        padding: 6px 4px 18px;
+        scrollbar-width: thin;
+        scrollbar-color: #000 #C9FF8F;
+    }
+
+    .carousel-row::-webkit-scrollbar { height: 8px; }
+    .carousel-row::-webkit-scrollbar-track {
+        background: #f0f0f0;
+        border-radius: 4px;
+    }
+    .carousel-row::-webkit-scrollbar-thumb {
+        background: #000;
+        border-radius: 4px;
+    }
+
+    .carousel-row > .book {
+        flex: 0 0 200px;
+        max-width: 200px;
+    }
+
+    .carousel-arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        border: 4px solid #000;
+        background: #C9FF8F;
+        font-size: 32px;
+        font-weight: 900;
+        cursor: pointer;
+        z-index: 50;
+        box-shadow: 4px 4px 0px #000;
+        transition: all 0.1s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+        padding: 0;
+        color: #000;
+    }
+    .carousel-arrow:hover {
+        background: #b7f07d;
+        transform: translateY(-50%) scale(1.08);
+    }
+    .carousel-arrow:active {
+        transform: translateY(-50%) translate(2px, 2px);
+        box-shadow: 1px 1px 0px #000;
+    }
+    .carousel-arrow:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+    }
+    .carousel-arrow.left  { left: -10px; }
+    .carousel-arrow.right { right: -10px; }
 </style>
 </head>
 
@@ -334,9 +402,26 @@
 
     <!-- CONTEÚDO -->
     <div class="content">
+        <!-- Bloco de recomendados (oculto até o usuário ter favoritos) -->
+        <div id="recommended-block" style="display: none; margin-bottom: 35px;">
+            <div class="section-title">Recomendados para você</div>
+            <p style="font-weight: 600; color:#444; margin-top:-15px; margin-bottom:20px; font-size:14px;">
+                Baseado nos livros que você favoritou.
+            </p>
+            <div class="carousel-wrapper">
+                <button class="carousel-arrow left" onclick="scrollCarousel(-1, 'recommended-grid')" aria-label="Anterior">&lsaquo;</button>
+                <div class="carousel-row" id="recommended-grid"></div>
+                <button class="carousel-arrow right" onclick="scrollCarousel(1, 'recommended-grid')" aria-label="Próximo">&rsaquo;</button>
+            </div>
+        </div>
+
         <div class="section-title">Livros Disponíveis</div>
-        <div class="books-grid" id="books-grid">
-            <p style="font-weight: 600;">Carregando acervo...</p>
+        <div class="carousel-wrapper">
+            <button class="carousel-arrow left" onclick="scrollCarousel(-1, 'books-grid')" aria-label="Anterior">&lsaquo;</button>
+            <div class="carousel-row" id="books-grid">
+                <p style="font-weight: 600;">Carregando acervo...</p>
+            </div>
+            <button class="carousel-arrow right" onclick="scrollCarousel(1, 'books-grid')" aria-label="Próximo">&rsaquo;</button>
         </div>
     </div>
 
@@ -383,6 +468,7 @@
             if (res.ok) {
                 allBooks = books;
                 renderBooks(allBooks);
+                loadRecommendations();
             } else {
                 booksGrid.innerHTML = "<p style='font-weight:600;'>Erro ao carregar livros.</p>";
             }
@@ -390,6 +476,80 @@
         } catch (err) {
             console.error(err);
             booksGrid.innerHTML = "<p style='font-weight:600;'>Erro de conexão com o servidor.</p>";
+        }
+    }
+
+    /* ===== CARROSSEL: scroll horizontal de qualquer fileira ===== */
+    function scrollCarousel(direction, targetId) {
+        // compatível com a chamada antiga (apenas direction) — caia em 'recommended-grid'
+        const id = targetId || 'recommended-grid';
+        const row = document.getElementById(id);
+        if (!row) return;
+        // rola ~3 cards de cada vez (200px largura + 22px gap)
+        const step = (200 + 22) * 3 * direction;
+        row.scrollBy({ left: step, behavior: 'smooth' });
+    }
+
+    /* ===== RECOMENDADOS (baseado nos livros que o usuário favoritou) ===== */
+    async function loadRecommendations() {
+        const block = document.getElementById('recommended-block');
+        const grid = document.getElementById('recommended-grid');
+        const favs = JSON.parse(localStorage.getItem('favoritos') || '[]');
+
+        // sem favoritos não tem como recomendar — esconde o bloco
+        if (favs.length === 0) {
+            block.style.display = 'none';
+            return;
+        }
+
+        // junta as tags de todos os livros favoritados
+        const tags = new Set();
+        favs.forEach(id => {
+            const book = allBooks.find(b => b._id === id);
+            if (book && Array.isArray(book.tags)) {
+                book.tags.forEach(t => tags.add(t));
+            }
+        });
+
+        if (tags.size === 0) {
+            block.style.display = 'none';
+            return;
+        }
+
+        const token = localStorage.getItem('leiturar_token');
+        try {
+            const r = await fetch(`${API_URL}/books/recommend`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ tags: Array.from(tags) })
+            });
+            const data = await r.json();
+            // remove livros que o usuário já favoritou (não recomenda o que ele já guardou)
+            const sugeridos = (data.recomendacoes || []).filter(b => !favs.includes(b._id)).slice(0, 10);
+
+            if (sugeridos.length === 0) {
+                block.style.display = 'none';
+                return;
+            }
+
+            grid.innerHTML = sugeridos.map(b => {
+                const img = b.coverUrl || `img/${b._id}.jpg`;
+                return `
+                    <div class="book" onclick="openBookPopup('${b._id}')">
+                        <img src="${img}" alt="Capa"
+                            onerror="this.src='https://placehold.co/180x230/cccccc/000000?text=Sem+Imagem'">
+                        <div class="book-title">${escapeHtml(b.titulo)}</div>
+                        <div class="book-author">${escapeHtml(b.autor || '')}</div>
+                    </div>
+                `;
+            }).join('');
+            block.style.display = 'block';
+        } catch (err) {
+            console.error('erro ao buscar recomendações:', err);
+            block.style.display = 'none';
         }
     }
 
@@ -470,6 +630,7 @@
         }
         closePopup();
         renderBooks(allBooks);
+        loadRecommendations();
     }
 
     function removeFavorite(id) {
@@ -478,6 +639,7 @@
         localStorage.setItem("favoritos", JSON.stringify(favs));
         closePopup();
         renderBooks(allBooks);
+        loadRecommendations();
     }
 
     /* ===== PESQUISA ===== */
