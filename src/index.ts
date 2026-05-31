@@ -24,13 +24,13 @@ const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/leiturar';
 
 mongoose.connect(MONGO_URI)
   .then(() => {
-    console.log('✓ Conectado ao MongoDB com sucesso!');
+    console.log('[OK] Conectado ao MongoDB com sucesso!');
     app.listen(PORT, () => {
-      console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
+      console.log(`Servidor rodando em http://localhost:${PORT}`);
     });
   })
   .catch(err => {
-    console.error('❌ Erro crítico de conexão com o Mongo:');
+    console.error('[ERRO] Erro crítico de conexão com o Mongo:');
     console.error('Certifique-se de que o serviço do MongoDB está INICIADO no seu Windows.');
     console.error(err.message);
   });

@@ -8,7 +8,8 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "extract-books": "ts-node --transpile-only src/scripts/extractBooks.ts",
-    "convert-pdfs": "ts-node --transpile-only src/scripts/convertPdfsToHtml.ts"
+    "convert-pdfs": "ts-node --transpile-only src/scripts/convertPdfsToHtml.ts",
+    "tag-books": "ts-node --transpile-only src/scripts/tagBooks.ts"
   },
   "author": "Equipe Leiturar",
   "license": "MIT",

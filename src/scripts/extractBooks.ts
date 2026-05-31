@@ -53,28 +53,28 @@ function parseFilename(filename: string): { titulo: string; autor: string; guten
 
 async function main() {
   if (!ZIP_PATH) {
-    console.error('❌ defina BOOKS_ZIP_PATH no .env (caminho absoluto do ZIP do Gutenberg)');
+    console.error('[ERRO] defina BOOKS_ZIP_PATH no .env (caminho absoluto do ZIP do Gutenberg)');
     process.exit(1);
   }
   if (!fs.existsSync(ZIP_PATH)) {
-    console.error(`❌ ZIP não encontrado em: ${ZIP_PATH}`);
+    console.error(`[ERRO] ZIP não encontrado em: ${ZIP_PATH}`);
     process.exit(1);
   }
 
-  console.log(`📦 abrindo ZIP master: ${ZIP_PATH}`);
+  console.log(`abrindo ZIP master: ${ZIP_PATH}`);
   const master = new AdmZip(ZIP_PATH);
   const entries = master.getEntries();
 
   // pega só os .zip internos (ignora pastas)
   const innerZips = entries.filter(e => !e.isDirectory && /\.zip$/i.test(e.entryName));
-  console.log(`📚 encontrados ${innerZips.length} livros no dataset`);
+  console.log(`encontrados ${innerZips.length} livros no dataset`);
 
   if (!fs.existsSync(OUTPUT_DIR)) {
     fs.mkdirSync(OUTPUT_DIR, { recursive: true });
   }
 
   await mongoose.connect(MONGO_URI);
-  console.log('✓ conectado ao MongoDB');
+  console.log('[OK] conectado ao MongoDB');
 
   let ok = 0;
   let skipped = 0;
@@ -84,14 +84,14 @@ async function main() {
     const fileName = path.basename(entry.entryName);
     const parsed = parseFilename(fileName);
     if (!parsed) {
-      console.warn(`⚠ pulando (nome não bate o padrão): ${fileName}`);
+      console.warn(`[AVISO] pulando (nome não bate o padrão): ${fileName}`);
       skipped++;
       continue;
     }
 
     const slug = slugify(parsed.titulo).slice(0, 80);
     if (!slug) {
-      console.warn(`⚠ pulando (slug vazio após normalizar): ${fileName}`);
+      console.warn(`[AVISO] pulando (slug vazio após normalizar): ${fileName}`);
       skipped++;
       continue;
     }
@@ -112,7 +112,7 @@ async function main() {
       const innerEntries = innerZip.getEntries();
       const htmlEntry = innerEntries.find(e => /\.x?html$/i.test(e.entryName) && !e.isDirectory);
       if (!htmlEntry) {
-        console.warn(`⚠ sem HTML em ${fileName}, pulando`);
+        console.warn(`[AVISO] sem HTML em ${fileName}, pulando`);
         skipped++;
         continue;
       }
@@ -148,10 +148,10 @@ async function main() {
         { upsert: true, setDefaultsOnInsert: true }
       );
 
-      console.log(`✓ ${slug.padEnd(50)} — ${parsed.titulo}`);
+      console.log(`[OK] ${slug.padEnd(50)} — ${parsed.titulo}`);
       ok++;
     } catch (err) {
-      console.error(`✗ falhou ${fileName}:`, err instanceof Error ? err.message : err);
+      console.error(`[FALHA] falhou ${fileName}:`, err instanceof Error ? err.message : err);
       failed++;
     }
   }

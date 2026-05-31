@@ -13,6 +13,29 @@
  *                       (default: ../../PI-5_TIME-4-Frontend/pages)
  */
 
+// Polyfills mínimos para o pdfjs-dist (dep do pdf-parse v2) no Node >= 20
+// — só precisamos extrair texto, não renderizar, então stubs vazios bastam.
+const g = globalThis as any;
+if (typeof g.DOMMatrix === 'undefined') {
+  g.DOMMatrix = class DOMMatrix {
+    constructor() {}
+    multiply() { return this; }
+    translate() { return this; }
+    scale() { return this; }
+    rotate() { return this; }
+    invertSelf() { return this; }
+    transformPoint(p: any) { return p; }
+  };
+}
+if (typeof g.ImageData === 'undefined') {
+  g.ImageData = class ImageData {
+    constructor(public data: any, public width: number, public height: number) {}
+  };
+}
+if (typeof g.Path2D === 'undefined') {
+  g.Path2D = class Path2D {};
+}
+
 import { PDFParse } from 'pdf-parse';
 import dotenv from 'dotenv';
 import fs from 'fs';
@@ -153,18 +176,18 @@ ${chaptersHtml}
 
 async function main() {
   await mongoose.connect(MONGO_URI);
-  console.log('✓ conectado ao MongoDB');
+  console.log('[OK] conectado ao MongoDB');
 
   if (!fs.existsSync(OUTPUT_DIR)) fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 
   for (const book of BOOKS) {
     const pdfPath = path.join(PDFS_DIR, `${book.id}.pdf`);
     if (!fs.existsSync(pdfPath)) {
-      console.warn(`⚠ pulando ${book.id}: PDF não encontrado em ${pdfPath}`);
+      console.warn(`[AVISO] pulando ${book.id}: PDF não encontrado em ${pdfPath}`);
       continue;
     }
 
-    console.log(`\n📖 convertendo ${book.titulo}...`);
+    console.log(`\nconvertendo ${book.titulo}...`);
     const buf = fs.readFileSync(pdfPath);
     const result = await new PDFParse({ data: buf }).getText();
 
@@ -173,7 +196,7 @@ async function main() {
     let chapters = parseChapters(cleaned);
 
     if (chapters.length === 0) {
-      console.warn(`⚠ ${book.id}: nenhum capítulo detectado, gerando texto único`);
+      console.warn(`[AVISO] ${book.id}: nenhum capítulo detectado, gerando texto único`);
       chapters = [{
         numero: '1',
         titulo: book.titulo,
@@ -205,7 +228,7 @@ async function main() {
       { _id: book.id },
       { $set: { coverUrl, htmlUrl, fonte: 'pdf-convertido' } }
     );
-    console.log(`✓ ${book.id}: HTML pronto + Mongo atualizado`);
+    console.log(`[OK] ${book.id}: HTML pronto + Mongo atualizado`);
   }
 
   await mongoose.disconnect();

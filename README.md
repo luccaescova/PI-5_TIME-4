@@ -1,13 +1,13 @@
-# 📚 Leiturar – Plataforma de Biblioteca Digital Interativa
+# Leiturar – Plataforma de Biblioteca Digital Interativa
 
-## 🧩 Sobre o Projeto
+## Sobre o Projeto
 
 O **Leiturar** é uma plataforma digital que integra **tecnologia e educação**, oferecendo uma **biblioteca online interativa** com funcionalidades voltadas ao **apoio de professores e estudantes**.
 Seu objetivo é **democratizar o acesso à leitura** e **facilitar o aprendizado**, com recursos como leitor de PDFs, questões comentadas e acompanhamento de progresso.
 
 ---
 
-## 🚀 Objetivos
+## Objetivos
 
 * Facilitar o acesso à leitura, eliminando barreiras físicas e logísticas.
 * Oferecer ferramentas interativas de aprendizado (questões, resumos, marcações).
@@ -17,42 +17,42 @@ Seu objetivo é **democratizar o acesso à leitura** e **facilitar o aprendizado
 
 ---
 
-## 🧠 Funcionalidades
+## Funcionalidades
 
 ### Funcionalidades obrigatórias (MVP)
 
-* 📖 **Leitor de PDF** – leitura online de livros e materiais.
-* 👤 **Login/Cadastro de Usuário** – autenticação e controle de acesso.
-* 🔍 **Busca por Livros** – pesquisa por título, autor ou tema.
-* 🧾 **Módulo de Questões** – perguntas e respostas associadas às obras.
-* ✅ **Gabarito de Questões** – correção automática e feedback.
+* **Leitor de PDF** – leitura online de livros e materiais.
+* **Login/Cadastro de Usuário** – autenticação e controle de acesso.
+* **Busca por Livros** – pesquisa por título, autor ou tema.
+* **Módulo de Questões** – perguntas e respostas associadas às obras.
+* **Gabarito de Questões** – correção automática e feedback.
 
 ### Funcionalidades desejáveis (Pós-MVP)
 
-* ⭐ **Favoritar Livros**
-* ⏩ **Continuar Lendo**
-* 💡 **Recomendações de Leitura**
-* 🔑 **Recuperação de Senha**
-* 🌙 **Modo Noturno / Acessibilidade**
+* **Favoritar Livros**
+* **Continuar Lendo**
+* **Recomendações de Leitura**
+* **Recuperação de Senha**
+* **Modo Noturno / Acessibilidade**
 
 ---
 
-## 🧰 Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
 Com base na estrutura de arquivos, o projeto utiliza uma arquitetura de **microserviços** ou **backend dividido**, empregando **duas tecnologias de backend** e um front-end tradicional.
 
 | Camada                            | Tecnologia                    | Função                                                    |
 | --------------------------------- | ----------------------------- | ----------------------------------------------------------------- |
-| **Front-end**                     | HTML, CSS, JavaScript         | Interface do usuário e lógica de apresentação.                      |
-| **Back-end Principal**            | **TypeScript/Node.js (Express)**| **Gestão de Usuários, Autenticação, Livros e Rotas principais**.    |
-| **Back-end de Correção**          | **Java (Spring Boot)**        | **Servidor exclusivo para a lógica de correção automática de questões.** |
-| **Banco de Dados**                | MongoDB Atlas                 | Armazenamento de usuários, livros e questões.                     |
+| **Front-end** | HTML, CSS, JavaScript         | Interface do usuário e lógica de apresentação.                      |
+| **Back-end Principal** | **TypeScript/Node.js (Express)**| **Gestão de Usuários, Autenticação, Livros e Rotas principais**.    |
+| **Back-end de Correção** | **Java (Spring Boot)** | **Servidor exclusivo para a lógica de correção automática de questões.** |
+| **Banco de Dados** | MongoDB Atlas                 | Armazenamento de usuários, livros e questões.                     |
 | **Gerenciamento de dependências** | Maven (Java), NPM/Yarn (Node) | Organização e build dos respectivos projetos de backend.            |
-| **Design/Protótipo**              | Figma                         | Protótipos de interface e fluxo do usuário.                         |
+| **Design/Protótipo** | Figma                         | Protótipos de interface e fluxo do usuário.                         |
 
 ---
 
-## 🧱 Arquitetura da Solução
+## Arquitetura da Solução
 
 A estrutura de pastas reflete a divisão das responsabilidades entre os dois backends e o front-end. O **Server Java** é isolado e atua como um microserviço para a função específica de correção.
 
@@ -60,17 +60,17 @@ A estrutura de pastas reflete a divisão das responsabilidades entre os dois bac
 ```
 PI-4-TIME-17-
 │
-├── 📁 BACKEND/
-│   ├── 📁 node_modules/
-│   ├── 📁 src/
-│   │   ├── 📁 config/
+├── BACKEND/
+│   ├── node_modules/
+│   ├── src/
+│   │   ├── config/
 │   │   │   └── seed.ts
-│   │   ├── 📁 controllers/
+│   │   ├── controllers/
 │   │   │   ├── authController.ts
 │   │   │   ├── booksController.ts
 │   │   │   └── helpController.ts
-│   │   ├── 📁 models/          # Definições de schemas (Book, User, etc)
-│   │   ├── 📁 routes/          # Definições das rotas da API
+│   │   ├── models/          # Definições de schemas (Book, User, etc)
+│   │   ├── routes/          # Definições das rotas da API
 │   │   ├── app.ts              # Configuração do Express e Middlewares
 │   │   └── index.ts            # Ponto de entrada (Conexão DB e Server)
 │   ├── .env                    # Variáveis de ambiente (Portas, MongoDB URI)
@@ -78,9 +78,9 @@ PI-4-TIME-17-
 │   ├── package.json
 │   └── tsconfig.json
 │
-├── 📁 FRONTEND/
-│   └── 📁 pages/
-│       ├── 📁 img/             # Capas dos livros e ícones
+├── FRONTEND/
+│   └── pages/
+│       ├── img/             # Capas dos livros e ícones
 │       ├── ajuda.html
 │       ├── Favoritos.html
 │       ├── Login.html
@@ -94,7 +94,7 @@ PI-4-TIME-17-
 
 ---
 
-## ⚙️ Sistema de Recomendação de Livros por Tags (Python)
+## Sistema de Recomendação de Livros por Tags (Python)
 
 O projeto conta com um microserviço em **Python (Flask)** responsável por recomendar livros com base nas preferências do usuário.
 
@@ -140,7 +140,7 @@ POST /books/recommend
 
 ---
 
-## 📦 Importação do Dataset de Livros
+## Importação do Dataset de Livros
 
 O backend agora serve **HTML estático** dos livros (em vez de PDF) para o leitor com sumário lateral. O fluxo tem duas fontes:
 
@@ -170,7 +170,7 @@ FRONTEND_PAGES_DIR=C:\caminho\para\PI-5_TIME-4-Frontend\pages
 npm run extract-books
 
 # 1x — converte os 3 PDFs (dom_casmurro, magico_oz, vidas_secas) em HTML
-#      e atualiza os mesmos registros do Mongo com htmlUrl + coverUrl
+# e atualiza os mesmos registros do Mongo com htmlUrl + coverUrl
 npm run convert-pdfs
 ```
 
@@ -199,7 +199,7 @@ A pasta `public/books/` é gerada localmente pelos scripts acima e está no `.gi
 
 ---
 
-## 🧩 Estrutura do Banco de Dados
+## Estrutura do Banco de Dados
 
 | Coleção         | Campos principais                                   | Descrição                                  |
 | --------------- | --------------------------------------------------- | ------------------------------------------ |
@@ -211,7 +211,7 @@ A pasta `public/books/` é gerada localmente pelos scripts acima e está no `.gi
 
 ---
 
-## 🧪 Como Executar o Projeto
+## Como Executar o Projeto
 
 ### Pré-requisitos
 
@@ -284,7 +284,7 @@ A pasta `public/books/` é gerada localmente pelos scripts acima e está no `.gi
 
 ---
 
-## 🧑‍💻 Equipe de Desenvolvimento
+## Equipe de Desenvolvimento
 
 | Nome                               | RA       |
 | -----------------------------------| -------- | 
@@ -296,19 +296,19 @@ A pasta `public/books/` é gerada localmente pelos scripts acima e está no `.gi
 | Pedro Henrique Ribeiro Silva Murta | 24015586 | 
 ---
 
-## 📆 Roadmap
+## Roadmap
 
-1. ✅ Levantamento de requisitos e ideação
-2. 🧩 Definição do MVP e arquitetura
-3. ⚙️ Desenvolvimento da IA
-4. 💾 Integração com MongoDB
-5. 🎨 Implementação do front-end
-6. 🧪 Testes e refinamento
-7. 🚀 Lançamento do Beta
+1. Levantamento de requisitos e ideação
+2. Definição do MVP e arquitetura
+3. Desenvolvimento da IA
+4. Integração com MongoDB
+5. Implementação do front-end
+6. Testes e refinamento
+7. Lançamento do Beta
 
 ---
 
-## 📄 Licença
+## Licença
 
 Este projeto é de uso educacional, desenvolvido no contexto da disciplina **Ideação e Validação em Engenharia de Software – PUC-Campinas (2026)**.
 Distribuído sob a licença **MIT**.

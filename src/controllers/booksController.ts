@@ -63,6 +63,74 @@ export async function listBooksController(req: Request, res: Response) {
   }
 }
 
+// retorna lista de tags únicas extraídas de todos os livros do banco
+export async function listTagsController(_req: Request, res: Response) {
+  try {
+    const books = await Book.find({}, { tags: 1, _id: 0 }).lean();
+    const tags = new Set<string>();
+    for (const b of books as Array<{ tags?: string[] }>) {
+      for (const t of (b.tags || [])) {
+        if (typeof t === 'string' && t.trim()) tags.add(t.trim().toLowerCase());
+      }
+    }
+    return res.json({ tags: Array.from(tags).sort() });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'erro' });
+  }
+}
+
+// recebe um array de tags e retorna livros ordenados por número de tags em comum
+export async function recommendBooksController(req: Request, res: Response) {
+  try {
+    const { tags } = req.body as { tags?: string[] };
+    if (!Array.isArray(tags) || tags.length === 0) {
+      return res.status(400).json({ message: 'envie um array "tags" com pelo menos um valor' });
+    }
+
+    const userTags = new Set(tags.map(t => String(t).trim().toLowerCase()).filter(Boolean));
+    const books = await Book.find({}).lean();
+
+    type BookDoc = {
+      _id: string;
+      titulo: string;
+      autor: string;
+      tags?: string[];
+      coverUrl?: string;
+      htmlUrl?: string;
+    };
+
+    const recomendacoes = (books as BookDoc[])
+      .map(book => {
+        const bookTags = new Set((book.tags || []).map(t => String(t).trim().toLowerCase()));
+        const emComum: string[] = [];
+        for (const t of userTags) if (bookTags.has(t)) emComum.push(t);
+        return { book, score: emComum.length, tagsEmComum: emComum.sort() };
+      })
+      .filter(r => r.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .map(r => ({
+        _id: r.book._id,
+        titulo: r.book.titulo,
+        autor: r.book.autor,
+        tags: r.book.tags || [],
+        coverUrl: r.book.coverUrl,
+        htmlUrl: r.book.htmlUrl,
+        score: r.score,
+        tagsEmComum: r.tagsEmComum,
+      }));
+
+    return res.json({
+      tagsSelecionadas: Array.from(userTags),
+      total: recomendacoes.length,
+      recomendacoes,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'erro' });
+  }
+}
+
 export async function addBookController(req: Request, res: Response) {
   try {
     const { id, titulo, autor } = req.body;

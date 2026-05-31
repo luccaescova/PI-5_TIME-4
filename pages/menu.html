@@ -325,9 +325,10 @@
 
         <!-- DROPDOWN -->
         <div id="dropdownMenu" class="dropdown-menu">
-            <button onclick="window.location.href='Favoritos.html'">⭐ Favoritos</button>
-            <button onclick="window.location.href='ajuda.html'">❓ Dúvidas</button>
-            <button onclick="handleLogout()">🚪 Sair (Logout)</button>
+            <button onclick="window.location.href='Favoritos.html'">Favoritos</button>
+            <button onclick="window.location.href='recomendacao.html'">Recomendações</button>
+            <button onclick="window.location.href='ajuda.html'">Dúvidas</button>
+            <button onclick="handleLogout()">Sair</button>
         </div>
     </header>
 
@@ -417,7 +418,7 @@
                 <div class="book" onclick="openBookPopup('${book._id}')">
                     <img src="${imageUrl}" alt="Capa"
                         onerror="this.src='https://placehold.co/180x230/cccccc/000000?text=Sem+Imagem'">
-                    <div class="book-title">${escapeHtml(book.titulo)} ${isFav ? "⭐" : ""}</div>
+                    <div class="book-title">${escapeHtml(book.titulo)}${isFav ? ' (favorito)' : ''}</div>
                     <div class="book-author">${escapeHtml(book.autor || '')}</div>
                 </div>
             `;

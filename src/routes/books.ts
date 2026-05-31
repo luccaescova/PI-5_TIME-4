@@ -4,13 +4,21 @@ import {
   getBookQuestionsController,
   addQuestionController,
   addBookController,
-  corrigirRespostasController // Importe a função que criamos
+  corrigirRespostasController,
+  listTagsController,
+  recommendBooksController,
 } from '../controllers/booksController';
 
 const router = Router();
 
 // listar livros
 router.get('/', listBooksController);
+
+// listar tags únicas (para o seletor de recomendações)
+router.get('/tags', listTagsController);
+
+// recomendar livros a partir de tags
+router.post('/recommend', recommendBooksController);
 
 // criar livro (opcional/admin)
 router.post('/', addBookController);
@@ -21,7 +29,7 @@ router.get('/:bookId/questions', getBookQuestionsController);
 // adicionar questão a um livro
 router.post('/:bookId/questions', addQuestionController);
 
-// 2. Adicione a rota de correção (Equivalente ao @PostMapping do Java)
+// correção das respostas
 router.post('/corrigir', corrigirRespostasController);
 
 export default router;

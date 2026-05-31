@@ -8,6 +8,7 @@ export interface IBook {
   coverUrl?: string;
   htmlUrl?: string;
   fonte?: string; // 'gutenberg' | 'pdf-convertido' | 'manual'
+  tags?: string[];
 }
 
 const BookSchema = new Schema<IBook>({
@@ -17,6 +18,7 @@ const BookSchema = new Schema<IBook>({
   coverUrl: { type: String },
   htmlUrl: { type: String },
   fonte: { type: String },
+  tags: { type: [String], default: [] },
 }, {
   // Adiciona campos createdAt e updatedAt
   timestamps: true,

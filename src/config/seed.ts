@@ -15,7 +15,7 @@ export default async function seedDatabase() {
       senha: hash,
       email: 'lucca@exemplo.com' // [CORREÇÃO] Adicione esta linha
     });
-    console.log('✓ usuário seed criado:', ra);
+    console.log('[OK] usuário seed criado:', ra);
   } else {
     console.log('usuário seed já existe');
   }
@@ -25,7 +25,7 @@ export default async function seedDatabase() {
   const existingBook = await Book.findById(bookId);
   if (!existingBook) {
     await Book.create({ _id: bookId, titulo: 'O Mágico de Oz', autor: 'L. Frank Baum' });
-    console.log('✓ livro seed criado:', bookId);
+    console.log('[OK] livro seed criado:', bookId);
   } else {
     console.log('livro seed já existe');
   }
@@ -92,7 +92,7 @@ export default async function seedDatabase() {
     ];
 
     await Question.insertMany(questions);
-    console.log('✓ questões seed inseridas para', bookId);
+    console.log('[OK] questões seed inseridas para', bookId);
   } else {
     console.log('questões seed já existem para', bookId);
   }
@@ -108,7 +108,7 @@ export default async function seedDatabase() {
       titulo: 'Vidas Secas',
       autor: 'Graciliano Ramos'
     });
-    console.log('✓ livro seed criado:', bookId2);
+    console.log('[OK] livro seed criado:', bookId2);
   } else {
     console.log('livro seed já existe:', bookId2);
   }
@@ -176,7 +176,7 @@ export default async function seedDatabase() {
     ];
 
     await Question.insertMany(qs2);
-    console.log('✓ questões seed inseridas para', bookId2);
+    console.log('[OK] questões seed inseridas para', bookId2);
 
   } else {
     console.log('questões seed já existem para', bookId2);
@@ -193,7 +193,7 @@ export default async function seedDatabase() {
       titulo: 'Dom Casmurro',
       autor: 'Machado de Assis'
     });
-    console.log('✓ livro seed criado:', bookId3);
+    console.log('[OK] livro seed criado:', bookId3);
   } else {
     console.log('livro seed já existe:', bookId3);
   }
@@ -261,7 +261,7 @@ export default async function seedDatabase() {
     ];
 
     await Question.insertMany(qs3);
-    console.log('✓ questões seed inseridas para', bookId3);
+    console.log('[OK] questões seed inseridas para', bookId3);
 
   } else {
     console.log('questões seed já existem para', bookId3);

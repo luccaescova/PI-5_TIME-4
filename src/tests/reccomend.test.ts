@@ -2,7 +2,7 @@ import request from 'supertest';
 import mongoose from 'mongoose';
 import app from '../app'; // Caminho para o seu arquivo app.ts
 
-describe('🧪 Testes de Validação da IA de Recomendação por Tags', () => {
+describe('Testes de Validação da IA de Recomendação por Tags', () => {
   
   // Conectar ao banco antes dos testes (usa o banco local do seed)
   beforeAll(async () => {
