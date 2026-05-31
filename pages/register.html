@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leiturar - Registrar</title>
+<style>
+/* CSS do arquivo pi.txt - Mantido integralmente */
+    body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #1C3B3B;
+        font-family: Arial, sans-serif;
+    }
+
+    .register-container {
+        background-color: #C9FF8F;
+        width: 380px;
+        padding: 30px 35px;
+        border-radius: 10px;
+        border: 2px solid #000;
+        box-shadow: 0 0 14px rgba(0,0,0,0.35);
+        text-align: center;
+    }
+
+    .register-title {
+        font-size: 28px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 25px;
+        text-transform: uppercase;
+        border-bottom: 2px solid #7CD957;
+        padding-bottom: 10px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+        width: calc(100% - 24px);
+        padding: 12px;
+        margin-bottom: 15px;
+        border: 2px solid #ccc;
+        border-radius: 6px;
+        box-sizing: border-box;
+        font-size: 16px;
+    }
+
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="password"]:focus {
+        border-color: #7CD957;
+        outline: none;
+    }
+
+    .register-btn {
+        width: 100%;
+        padding: 12px;
+        background-color: #7CD957;
+        color: black;
+        font-size: 16px;
+        font-weight: bold;
+        border: 2px solid #000;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .register-btn:hover {
+        transform: scale(1.03);
+        background-color: #6bd04c;
+    }
+
+    .login-link {
+        display: block;
+        margin-top: 12px;
+        font-size: 14px;
+        color: black;
+        text-decoration: none;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .login-link:hover {
+        text-decoration: underline;
+    }
+</style>
+
+</head>
+<body>
+
+<div class="register-container">
+    <div class="register-title">REGISTRAR</div>
+
+    <form onsubmit="handleRegister(event)">
+        <input type="text" id="nome" placeholder="Nome completo" required />
+        <input type="text" id="ra" placeholder="RA" required />
+        <input type="email" id="email" placeholder="E-mail" required />
+        <input type="password" id="senha" placeholder="Senha" required />
+        <button type="submit" class="register-btn">REGISTRAR</button>
+    </form>
+    <a href="Login.html" class="login-link">Já tenho conta</a>
+</div>
+
+<script>
+    // URL base da sua API Node/TypeScript
+    const API_URL = 'http://localhost:4000';
+
+    /**
+     * Lida com o envio do formulário de registro.
+     * @param {Event} event O evento de submissão do formulário.
+     */
+    async function handleRegister(event) {
+        event.preventDefault(); // Impede o recarregamento padrão da página
+
+        const nome = document.getElementById('nome').value;
+        const ra = document.getElementById('ra').value;
+        const email = document.getElementById('email').value;
+        const senha = document.getElementById('senha').value;
+
+        try {
+            const response = await fetch(`${API_URL}/auth/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ nome, ra, email, senha })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Registro bem-sucedido
+                alert('Cadastro realizado com sucesso! Faça login.');
+                window.location.href = 'Login.html';
+            } else {
+                // Erro no registro (ex: RA já cadastrado)
+                alert(`Erro ao registrar: ${data.message || 'Verifique os dados e tente novamente.'}`);
+            }
+        } catch (error) {
+            // Erro de conexão com o servidor
+            console.error('Erro na requisição:', error);
+            alert('Erro de conexão com o servidor. Verifique se o backend está ativo na porta 4000.');
+        }
+    }
+</script>
+
+</body>
+</html>

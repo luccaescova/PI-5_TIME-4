@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Leiturar – Login</title>
+
+<style>
+    /* Reset e Configuração Base */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    }
+
+    body {
+        margin: 0;
+        height: 100vh;
+        width: 100vw;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #1C3B3B; /* Verde escuro base */
+        overflow: hidden;
+        padding: 20px;
+    }
+
+    /* Container de Login Neobrutalista */
+    .login-container {
+        background-color: #C9FF8F; /* Verde limão clássico */
+        width: 100%;
+        max-width: 400px;
+        padding: 40px 35px;
+        border-radius: 16px;
+        border: 4px solid #000000;
+        box-shadow: 10px 10px 0px #000000; /* Sombra sólida marcante */
+        text-align: center;
+    }
+
+    .login-title {
+        font-size: 32px;
+        font-weight: 900;
+        margin-bottom: 25px;
+        color: #000000;
+        text-transform: uppercase;
+        letter-spacing: -1px;
+    }
+
+    /* Campos de Entrada Modernos */
+    .login-container input {
+        width: 100%;
+        padding: 12px 16px;
+        margin-bottom: 18px;
+        font-size: 16px;
+        font-weight: 600;
+        border: 3px solid #000000;
+        border-radius: 8px;
+        outline: none;
+        background-color: #ffffff;
+        transition: all 0.1s ease;
+    }
+
+    .login-container input:focus {
+        box-shadow: 4px 4px 0px #000000;
+        transform: translate(-2px, -2px);
+    }
+
+    /* Botão Principal */
+    .login-btn {
+        width: 100%;
+        padding: 14px;
+        background-color: #7CD957; /* Verde vivo */
+        color: #000000;
+        font-size: 18px;
+        font-weight: 800;
+        text-transform: uppercase;
+        border: 3px solid #000000;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.1s ease;
+        box-shadow: 4px 4px 0px #000000;
+    }
+
+    .login-btn:hover {
+        transform: translate(-2px, -2px);
+        box-shadow: 6px 6px 0px #000000;
+        background-color: #8ce666;
+    }
+
+    .login-btn:active {
+        transform: translate(4px, 4px);
+        box-shadow: 0px 0px 0px #000000;
+    }
+
+    /* Links Utilitários Estilizados */
+    .forgot-link {
+        display: inline-block;
+        margin-top: 15px;
+        font-size: 14px;
+        color: #000000;
+        text-decoration: none;
+        font-weight: 700;
+        cursor: pointer;
+        transition: opacity 0.1s;
+    }
+
+    .forgot-link:hover {
+        text-decoration: underline;
+    }
+
+    /* ------ POP-UPS MODERNIZADOS ------ */
+    .popup-background {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(28, 59, 59, 0.7); /* Overlay escura em harmonia */
+        backdrop-filter: blur(4px);
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+    }
+
+    .popup-box {
+        background: #ffffff; /* Fundo branco para destacar os inputs */
+        width: 100%;
+        max-width: 380px;
+        padding: 30px;
+        border-radius: 16px;
+        border: 4px solid #000000;
+        box-shadow: 8px 8px 0px #000000;
+        text-align: center;
+    }
+
+    .popup-title {
+        font-size: 24px;
+        font-weight: 900;
+        text-transform: uppercase;
+        margin-bottom: 20px;
+        color: #000000;
+    }
+
+    .popup-box input {
+        width: 100%;
+        padding: 12px 16px;
+        margin-bottom: 15px;
+        border: 3px solid #000000;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: 600;
+        outline: none;
+        transition: all 0.1s ease;
+    }
+
+    .popup-box input:focus {
+        box-shadow: 4px 4px 0px #000000;
+        transform: translate(-2px, -2px);
+    }
+
+    /* Botão de Fechar Dinâmico */
+    .close-btn {
+        background-color: #ff6961;
+        color: #ffffff;
+        border: 3px solid #000000;
+        padding: 12px;
+        width: 100%;
+        margin-top: 10px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 800;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.1s ease;
+        box-shadow: 3px 3px 0px #000000;
+    }
+
+    .close-btn:hover {
+        transform: translate(-2px, -2px);
+        box-shadow: 5px 5px 0px #000000;
+        background-color: #ff827c;
+    }
+
+    .close-btn:active {
+        transform: translate(3px, 3px);
+        box-shadow: 0px 0px 0px #000000;
+    }
+</style>
+</head>
+<body>
+
+<div class="login-container">
+    <div class="login-title">LOGIN</div>
+    <form onsubmit="handleLogin(event)">
+        <input type="text" id="loginRA" placeholder="RA" required />
+        <input type="password" id="loginSenha" placeholder="Senha" required />
+        <button type="submit" class="login-btn">ENTRAR</button>
+
+        <a class="forgot-link" onclick="abrirPopup()">Esqueci a senha</a>
+
+        <div style="margin-top: 5px;">
+            <a class="forgot-link" href="Register.html" style="color: #1C3B3B; font-weight: 800;">
+                Criar conta
+            </a>
+        </div>
+    </form>
+</div>
+
+<div class="popup-background" id="popup">
+    <div class="popup-box">
+        <div class="popup-title">Recuperar senha</div>
+        <input type="text" id="popupRA" placeholder="Seu RA" required>
+        <input type="email" id="popupEmail" placeholder="Seu email cadastrado" required>
+        <button class="login-btn" onclick="enviarRecuperacao()">ENVIAR</button>
+        <button class="close-btn" onclick="fecharPopup()">FECHAR</button>
+    </div>
+</div>
+
+<div class="popup-background" id="popupReset">
+    <div class="popup-box">
+        <div class="popup-title">Redefinir senha</div>
+        <input type="password" id="novaSenha" placeholder="Nova senha" required>
+        <button class="login-btn" onclick="resetarSenha()">REDEFINIR</button>
+        <button class="close-btn" onclick="fecharPopupReset()">FECHAR</button>
+    </div>
+</div>
+
+<script>
+    const API_URL = 'http://localhost:4000'; 
+
+    // ---------- POPUPS ----------
+    function abrirPopup() {
+        document.getElementById("popup").style.display = "flex";
+    }
+
+    function fecharPopup() {
+        document.getElementById("popup").style.display = "none";
+    }
+
+    function abrirPopupReset() {
+        document.getElementById("popupReset").style.display = "flex";
+    }
+
+    function fecharPopupReset() {
+        document.getElementById("popupReset").style.display = "none";
+    }
+
+    // ---------- ETAPA 1: VERIFICA RA + EMAIL ---------
+    async function enviarRecuperacao() {
+        const ra = document.getElementById("popupRA").value;
+        const email = document.getElementById("popupEmail").value;
+
+        if (!ra || !email) {
+            alert("Preencha todos os campos!");
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_URL}/auth/forgot-password`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ra, email })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Salva o token localmente
+                localStorage.setItem("reset_token", data.token);
+
+                fecharPopup();  
+                abrirPopupReset(); 
+            } else {
+                alert(data.message);
+            }
+        } catch (error) {
+            alert('Erro de conexão com o servidor.');
+        }
+    }
+
+    // ---------- ETAPA 2: ENVIAR NOVA SENHA ----------
+    async function resetarSenha() {
+        const novaSenha = document.getElementById("novaSenha").value;
+        const token = localStorage.getItem("reset_token");
+
+        if (!novaSenha) {
+            alert("Digite sua nova senha!");
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_URL}/auth/reset-password/${token}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ novaSenha })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert("Senha redefinida com sucesso!");
+                localStorage.removeItem("reset_token");
+                fecharPopupReset();
+            } else {
+                alert(data.message);
+            }
+
+        } catch (error) {
+            alert("Erro ao se conectar ao servidor.");
+        }
+    }
+
+    // ----------- LOGIN ORIGINAL ----------
+    async function handleLogin(event) {
+        event.preventDefault();
+        const ra = document.getElementById('loginRA').value;
+        const senha = document.getElementById('loginSenha').value;
+
+        try {
+            const response = await fetch(`${API_URL}/auth/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ra, senha })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                localStorage.setItem('leiturar_token', data.token);
+                localStorage.setItem('leiturar_user', JSON.stringify(data.user));
+                window.location.href = 'Menu.html';
+            } else {
+                alert(data.message);
+            }
+        } catch (error) {
+            alert('Erro de conexão com o servidor.');
+        }
+    }
+</script>
+
+</body>
+</html>

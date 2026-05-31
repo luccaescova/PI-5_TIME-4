@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leiturar – Suporte IA</title>
+
+<style>
+    /* ... (Mantive seus estilos originais de body, container, header e dropdown) ... */
+    body { margin: 0; font-family: Arial, sans-serif; background-color: #1E1E1E; display: flex; justify-content: center; }
+    .container { background-color: #C9FF8F; width: 1000px; min-height: 100vh; border-radius: 10px; overflow: hidden; position: relative; }
+    header { display: flex; align-items: center; justify-content: space-between; padding: 25px 35px; background-color: #C9FF8F; }
+    .left-area { display: flex; align-items: center; gap: 25px; }
+    .menu-icon { width: 35px; height: 10px; background-color: black; position: relative; cursor: pointer; }
+    .menu-icon::before, .menu-icon::after { content: ""; width: 35px; height: 10px; background-color: black; position: absolute; left: 0; }
+    .menu-icon::before { top: -8px; } .menu-icon::after { top: 8px; }
+    .logo { font-size: 28px; font-weight: bold; color: black; }
+    .dropdown-menu { position: absolute; top: 75px; left: 35px; background-color: #C9FF8F; border: 2px solid black; border-radius: 8px; display: none; flex-direction: column; width: 180px; z-index: 1000; }
+    .dropdown-menu button { padding: 12px; background: #C9FF8F; border: none; border-bottom: 2px solid black; cursor: pointer; font-weight: bold; text-align: left; }
+    
+    /* CONTENT AJUSTADO PARA IA */
+    .content {
+        background-color: white;
+        width: 90%;
+        margin: 30px auto;
+        padding: 30px;
+        border-radius: 10px;
+        border: 1px solid #000;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .section-title { font-size: 26px; font-weight: bold; color: #333; margin-bottom: 10px; }
+    .section-text { font-size: 16px; color: #444; margin-bottom: 25px; }
+
+    .textarea-input {
+        width: 100%;
+        height: 100px;
+        padding: 12px;
+        font-size: 15px;
+        border: 2px solid #000;
+        border-radius: 8px;
+        resize: none;
+        margin-bottom: 15px;
+        box-sizing: border-box;
+    }
+
+    .send-btn {
+        width: 100%;
+        padding: 12px;
+        background-color: #7CD957;
+        border: 2px solid #000;
+        border-radius: 8px;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .send-btn:disabled { background-color: #ccc; cursor: not-allowed; }
+
+    /* ÁREA DE RESPOSTA DA IA */
+    #ai-response-container {
+        margin-top: 25px;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-left: 5px solid #7CD957;
+        border-radius: 4px;
+        display: none; /* Escondido até ter uma resposta */
+    }
+
+    .ai-label { font-weight: bold; color: #2b4d1f; margin-bottom: 8px; display: block; }
+    .ai-text { font-size: 15px; line-height: 1.6; color: #333; white-space: pre-wrap; }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <header>
+        <div class="left-area">
+            <div class="menu-icon" onclick="toggleDropdown()"></div>
+            <div class="logo">Leiturar AI</div>
+        </div>
+        <div id="dropdownMenu" class="dropdown-menu">
+            <button onclick="window.location.href='Menu.html'">Menu</button>
+            <button onclick="window.location.href='Favoritos.html'">Favoritos</button>
+            <button onclick="handleLogout()">Logout</button>
+        </div>
+    </header>
+
+    <div class="content">
+        <div class="section-title">Assistente Virtual</div>
+        <p class="section-text">
+            Pergunte qualquer coisa sobre os livros, autores ou como usar o Leiturar. Nossa IA está pronta para ajudar!
+        </p>
+
+        <textarea class="textarea-input" id="user-prompt" placeholder="Ex: Quem escreveu Dom Casmurro? ou Como favorito um livro?"></textarea>
+
+        <button class="send-btn" id="btn-ask">Perguntar ao Gemini</button>
+
+        <div id="ai-response-container">
+            <span class="ai-label">Resposta do Leiturar:</span>
+            <div class="ai-text" id="ai-answer"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+/* LÓGICA DE INTERFACE MANTIDA */
+function handleLogout() {
+    localStorage.removeItem('leiturar_token');
+    localStorage.removeItem('leiturar_user');
+    window.location.href = 'Login.html';
+}
+
+function toggleDropdown() {
+    const menu = document.getElementById("dropdownMenu");
+    menu.style.display = (menu.style.display === "flex") ? "none" : "flex";
+}
+
+/* ===== INTEGRAÇÃO COM O BACKEND (GEMINI STREAMING) ===== */
+document.getElementById("btn-ask").addEventListener("click", async () => {
+    const promptInput = document.getElementById("user-prompt");
+    const prompt = promptInput.value.trim();
+    const btn = document.getElementById("btn-ask");
+    const responseContainer = document.getElementById("ai-response-container");
+    const answerDiv = document.getElementById("ai-answer");
+
+    if (!prompt) {
+        alert("Por favor, digite uma pergunta.");
+        return;
+    }
+
+    // Estado de carregamento inicial
+    btn.innerText = "IA processando...";
+    btn.disabled = true;
+    answerDiv.innerText = ""; // Limpa a resposta anterior
+    responseContainer.style.display = "block"; // Já mostra o container para o texto surgir
+
+    try {
+        const response = await fetch("http://localhost:4000/help/ask", {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem('leiturar_token')}` 
+            },
+            body: JSON.stringify({ prompt })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || "Erro no servidor");
+        }
+
+        // --- LÓGICA DE STREAMING ---
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break; // Acabou a resposta
+
+            // Decodifica o pedaço binário em texto e adiciona na div
+            const chunkText = decoder.decode(value, { stream: true });
+            answerDiv.innerText += chunkText;
+            
+            // Scroll automático para acompanhar o texto surgindo (opcional)
+            responseContainer.scrollTop = responseContainer.scrollHeight;
+        }
+
+        promptInput.value = ""; // Limpa o campo após o sucesso total
+
+    } catch (err) {
+        console.error(err);
+        alert("Erro: " + err.message);
+    } finally {
+        btn.innerText = "Perguntar ao Gemini";
+        btn.disabled = false;
+    }
+});
+</script>
+
+</body>
+</html>
