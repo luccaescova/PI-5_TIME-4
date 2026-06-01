@@ -282,9 +282,8 @@ A pasta `public/books/` é gerada localmente pelos scripts acima e está no `.gi
    ```
    b. Acesse a interface abrindo `Login.html` no navegador.
 
----
-
 ## Equipe de Desenvolvimento
+---
 
 | Nome                               | RA       |
 | -----------------------------------| -------- | 
