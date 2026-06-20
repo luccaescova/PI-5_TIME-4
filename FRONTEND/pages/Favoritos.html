@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leiturar – Favoritos</title>
+
+<style>
+     body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: #1E1E1E;
+        display: flex;
+        justify-content: center;
+    }
+
+    .container {
+        background-color: #C9FF8F;
+        width: 1000px;
+        min-height: 100vh;
+        border-radius: 10px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    /* ------ TOPO ------ */
+    header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 25px 35px;
+        background-color: #C9FF8F;
+        position: relative;
+    }
+
+    .left-area {
+        display: flex;
+        align-items: center;
+        gap: 25px;
+    }
+
+    .menu-icon {
+        width: 35px;
+        height: 10px;
+        background-color: black;
+        position: relative;
+        cursor: pointer;
+    }
+
+    .menu-icon::before,
+    .menu-icon::after {
+        content: "";
+        width: 35px;
+        height: 10px;
+        background-color: black;
+        position: absolute;
+        left: 0;
+    }
+
+    .menu-icon::before { top: -8px; }
+    .menu-icon::after { top: 8px; }
+
+    .logo {
+        font-size: 28px;
+        font-weight: bold;
+        color: black;
+    }
+
+    /* ------ PESQUISA ------ */
+    .search-area {
+        display: flex;
+        align-items: center;
+    }
+
+    .search-input {
+        padding: 8px 12px;
+        border-radius: 20px;
+        border: 1px solid #333;
+        width: 260px;
+        font-size: 14px;
+    }
+
+    /* ------ ÁREA DO MENU ------ */
+    .content {
+        background-color: white;
+        margin: 30px auto;
+        width: 90%;
+        padding: 20px;
+        border-radius: 5px;
+        min-height: 400px;
+        border: 1px solid #000;
+    }
+
+    .section-title {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    .books-row {
+        display: flex;
+        justify-content: flex-start;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .book {
+        width: 180px;
+        background-color: #C9FF8F;
+        border: 2px solid #7cd957;
+        border-radius: 10px;
+        padding: 15px;
+        text-align: center;
+        cursor: pointer;
+        transition: 0.15s;
+    }
+
+    .book:hover {
+        transform: scale(1.05);
+    }
+
+    .book img {
+        width: 100%;
+        height: 230px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 1px solid #000;
+    }
+
+    .book-title {
+        margin-top: 10px;
+        font-weight: bold;
+        font-size: 15px;
+        color: #000;
+    }
+
+    /* ------ POPUP ------ */
+    .popup-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.6);
+        display: none;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .popup {
+        background: #C9FF8F;
+        padding: 25px;
+        width: 330px;
+        border-radius: 10px;
+        border: 2px solid black;
+        text-align: center;
+    }
+
+    .popup h2 {
+        margin: 0 0 20px 0;
+        font-size: 22px;
+        font-weight: bold;
+    }
+
+    .popup button {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        margin-top: 10px;
+        border-radius: 6px;
+        border: 2px solid black;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .btn-ler { background-color: #7CD957; }
+    .btn-questoes { background-color: #FFF275; }
+    .btn-close { background-color: #ff6961; }
+
+    /* ------ DROPDOWN MENU ------ */
+    .dropdown-menu {
+        position: absolute;
+        top: 75px;
+        left: 35px;
+        background-color: #C9FF8F;
+        border: 2px solid black;
+        border-radius: 8px;
+        display: none;
+        flex-direction: column;
+        width: 180px;
+        z-index: 1000;
+    }
+
+    .dropdown-menu button {
+        padding: 12px;
+        background: #C9FF8F;
+        border: none;
+        border-bottom: 2px solid black;
+        cursor: pointer;
+        font-weight: bold;
+        text-align: left;
+    }
+
+    .dropdown-menu button:hover {
+        background-color: #b7f07d;
+    }
+
+    .dropdown-menu button:last-child {
+        border-bottom: none;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <header>
+        <div class="left-area">
+            <div class="menu-icon" onclick="toggleDropdown()"></div>
+            <div class="logo">Leiturar</div>
+        </div>
+
+        <div class="search-area">
+            <input class="search-input" type="search" placeholder="Pesquisar...">
+        </div>
+
+        <div id="dropdownMenu" class="dropdown-menu">
+            <button onclick="window.location.href='Menu.html'">Menu</button>
+            <button onclick="window.location.href='ajuda.html'">Dúvidas</button>
+            <button onclick="handleLogout()">Logout</button>
+        </div>
+    </header>
+
+    <div class="content">
+        <div class="section-title">Seus favoritos</div>
+        <div class="books-row" id="booksList"></div>
+        <p id="emptyMsg">Sem livros favoritados</p>
+    </div>
+
+</div>
+
+<!-- POPUP -->
+<div class="popup-bg" id="popupBg">
+    <div class="popup">
+        <h2 id="popupTitle">Livro</h2>
+        <button class="btn-ler" id="btnLer">Ler</button>
+        <button class="btn-questoes" id="btnQuestoes">Questões</button>
+        <button id="btnDesfavoritar" style="background:#ffaf52;">Desfavoritar</button>
+        <button class="btn-close" onclick="closePopup()">Fechar</button>
+    </div>
+</div>
+
+<script>
+
+    const API_URL = "http://localhost:4000";
+
+    const favorites = JSON.parse(localStorage.getItem("favoritos")) || [];
+    const booksList = document.getElementById("booksList");
+    const emptyMsg = document.getElementById("emptyMsg");
+
+    let allBooks = [];
+
+    function handleLogout() {
+        localStorage.removeItem('leiturar_token');
+        localStorage.removeItem('leiturar_user');
+        window.location.href = 'Login.html';
+    }
+
+    async function loadBooks() {
+        const token = localStorage.getItem("leiturar_token");
+        if (!token) {
+            window.location.href = "Login.html";
+            return;
+        }
+
+        try {
+            const res = await fetch(`${API_URL}/books`, {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+
+            allBooks = await res.json();
+
+            if (!res.ok) {
+                booksList.innerHTML = "<p>Erro ao carregar livros.</p>";
+                return;
+            }
+
+            renderFavorites();
+
+        } catch (err) {
+            console.error(err);
+            booksList.innerHTML = "<p>Erro de conexão com o servidor.</p>";
+        }
+    }
+
+    function renderFavorites() {
+        if (favorites.length === 0) {
+            emptyMsg.style.display = "block";
+            return;
+        }
+
+        emptyMsg.style.display = "none";
+        booksList.innerHTML = "";
+
+        favorites.forEach(id => {
+            const book = allBooks.find(b => b._id === id);
+            if (!book) return;
+
+            const imageUrl = `img/${book._id}.jpg`;
+
+            booksList.innerHTML += `
+                <div class="book" onclick="openFavPopup('${book._id}')">
+                    <img src="${imageUrl}" 
+                        onerror="this.src='https://placehold.co/230x300/cccccc/000?text=Capa+Indisponível'">
+                    <div class="book-title">${book.titulo} ${favorites.includes(book._id) ? "⭐" : ""}</div>
+                </div>
+            `;
+        });
+    }
+
+    let currentBook = null;
+
+    function openFavPopup(bookId) {
+        const book = allBooks.find(b => b._id === bookId);
+        if (!book) return;
+
+        currentBook = bookId;
+
+        document.getElementById("popupTitle").innerText = book.titulo;
+        document.getElementById("popupBg").style.display = "flex";
+
+        document.getElementById("btnLer").onclick = () => {
+            window.location.href = `pdfs/${bookId}.pdf`;
+        };
+
+        document.getElementById("btnQuestoes").onclick = () => {
+            window.location.href = `Question.html?livro=${bookId}`;
+        };
+
+        document.getElementById("btnDesfavoritar").onclick = () => {
+            removeFavorite(bookId);
+        };
+    }
+
+    function closePopup() {
+        document.getElementById("popupBg").style.display = "none";
+    }
+
+    function removeFavorite(id) {
+        const updated = favorites.filter(f => f !== id);
+        localStorage.setItem("favoritos", JSON.stringify(updated));
+        location.reload();
+    }
+
+    /* ===== PESQUISA ===== */
+    const searchInput = document.querySelector(".search-input");
+    searchInput.addEventListener("input", () => {
+        const q = searchInput.value.toLowerCase();
+        const filtered = allBooks.filter(book =>
+            favorites.includes(book._id) &&
+            book.titulo.toLowerCase().includes(q)
+        );
+
+        booksList.innerHTML = "";
+
+        filtered.forEach(book => {
+            const imageUrl = `img/${book._id}.jpg`;
+            booksList.innerHTML += `
+                <div class="book" onclick="openFavPopup('${book._id}')">
+                    <img src="${imageUrl}" 
+                        onerror="this.src='https://placehold.co/230x300/cccccc/000?text=Capa+Indisponível'">
+                    <div class="book-title">${book.titulo} ${favorites.includes(book._id) ? "⭐" : ""}</div>
+                </div>
+            `;
+        });
+
+    });
+
+    /* ===== DROPDOWN ===== */
+    function toggleDropdown() {
+        const menu = document.getElementById("dropdownMenu");
+        menu.style.display = menu.style.display === "flex" ? "none" : "flex";
+    }
+
+    window.addEventListener("click", function(e) {
+        const menu = document.getElementById("dropdownMenu");
+        const icon = document.querySelector(".menu-icon");
+        if (!menu.contains(e.target) && !icon.contains(e.target)) {
+            menu.style.display = "none";
+        }
+    });
+
+    window.onload = loadBooks;
+
+</script>
+
+</body>
+</html>
